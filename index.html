@@ -426,7 +426,6 @@
             color: var(--gold);
         }
 
-        /* تحسينات إضافية لتجاوب الشاشات الصغيرة جداً والموبايل */
         @media (max-width: 768px) {
             header {
                 flex-direction: column;
@@ -525,7 +524,7 @@
 
             <div class="section-title">الإعلانات العقارية المتوفرة</div>
             <div class="ads-grid" id="main-ads-grid">
-                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات منشورة حالياً. أضف إعلانك الأول!</div>
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">جاري تحميل الإعلانات من قاعدة البيانات...</div>
             </div>
 
             <div class="section-title">حاسبة التمويل العقاري</div>
@@ -754,13 +753,32 @@
     </div>
 
     <footer>
-        <p>جميع الحقوق محفوظة © المواثيق العقارية</p>
+        <p>جميع الحقوق محفوظة ©️ المواثيق العقارية</p>
     </footer>
 
+    <!-- مكتبة الخرائط Leaflet -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
+
+    <!-- سكربتات Firebase وربط قاعدة البيانات Firestore -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, increment, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // إعدادات فايربيس الخاصة بمشروعك
+        const firebaseConfig = {
+            apiKey: "AIzaSyD...", // استبدلها بالبيانات الخاصة بك من لوحة تحكم فايربيس
+            authDomain: "abdullah-14d5c.firebaseapp.com",
+            projectId: "abdullah-14d5c",
+            storageBucket: "abdullah-14d5c.appspot.com",
+            messagingSenderId: "463646549767",
+            appId: "1:463646549767:web:68dfac3533e5ff6y081f0y"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         let map, marker, fullMap, fullMarker;
-        let allAds = JSON.parse(localStorage.getItem('almawathiq_ads')) || [];
+        let allAds = [];
         let favorites = JSON.parse(localStorage.getItem('almawathiq_favs')) || [];
         let isLoggedIn = false;
         let currentUser = { name: '', phone: '' };
@@ -790,7 +808,7 @@
             map.setView(latLng, 14);
         }
 
-        function locateUserPosition() {
+        window.locateUserPosition = function() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
@@ -806,14 +824,14 @@
             }
         }
 
-        window.onload = function() {
+        window.onload = async function() {
             initMap();
             fetchNews();
-            renderAllAds();
+            await loadAdsFromFirebase();
             updateFavoritesView();
         };
 
-        function switchPage(pageId) {
+        window.switchPage = function(pageId) {
             document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             window.scrollTo(0, 0);
@@ -821,11 +839,11 @@
             if(pageId === 'home') renderAllAds();
         }
 
-        function handleAccountClick() {
+        window.handleAccountClick = function() {
             isLoggedIn ? switchPage('profile') : switchPage('auth');
         }
 
-        function loginUser(event) {
+        window.loginUser = function(event) {
             event.preventDefault();
             currentUser.phone = document.getElementById('login-phone').value;
             currentUser.name = "مستخدم الجوال";
@@ -835,7 +853,7 @@
             switchPage('profile');
         }
 
-        function registerUser(event) {
+        window.registerUser = function(event) {
             event.preventDefault();
             currentUser.name = document.getElementById('reg-name').value;
             currentUser.phone = document.getElementById('reg-phone').value;
@@ -845,7 +863,7 @@
             switchPage('profile');
         }
 
-        function logoutUser() {
+        window.logoutUser = function() {
             isLoggedIn = false;
             document.getElementById('account-btn').innerText = "تسجيل الدخول";
             switchPage('home');
@@ -857,7 +875,7 @@
             renderAllAds();
         }
 
-        function loadRegisterPic(event) {
+        window.loadRegisterPic = function(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -873,7 +891,23 @@
             }
         }
 
-        async function addNewAd(event) {
+        // جلب الإعلانات من قاعدة بيانات Firestore السحابية
+        async function loadAdsFromFirebase() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "ads"));
+                allAds = [];
+                querySnapshot.forEach((docSnap) => {
+                    allAds.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderAllAds();
+            } catch (error) {
+                console.error("خطأ في جلب الإعلانات: ", error);
+                document.getElementById('main-ads-grid').innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">حدث خطأ في تحميل الإعلانات من قاعدة البيانات.</div>';
+            }
+        }
+
+        // إضافة إعلان جديد إلى Firestore
+        window.addNewAd = async function(event) {
             event.preventDefault();
 
             const imageFiles = document.getElementById('ad-images-input').files;
@@ -892,28 +926,35 @@
             }
 
             const newAd = {
-                id: 'ad_' + Date.now(),
                 title: document.getElementById('ad-title-input').value,
                 description: document.getElementById('ad-desc-input').value,
                 purpose: document.getElementById('ad-purpose-input').value,
                 type: document.getElementById('ad-type-input').value,
                 price: parseFloat(document.getElementById('ad-price-input').value),
                 city: document.getElementById('ad-city-input').value,
-                lat: document.getElementById('ad-lat').value,
-                lng: document.getElementById('ad-lng').value,
+                lat: document.getElementById('ad-lat').value || "",
+                lng: document.getElementById('ad-lng').value || "",
                 images: images,
                 videos: videos,
                 views: 0,
                 date: new Date().toLocaleDateString('ar-QA')
             };
 
-            allAds.unshift(newAd);
-            saveToLocalStorage();
-            alert('تم نشر الإعلان بنجاح!');
-            event.target.reset();
-            if(marker) { map.removeLayer(marker); marker = null; }
-            document.getElementById('coords-text').innerText = "اضغط على الخريطة لتحديد موقع العقار بدقة";
-            switchPage('home');
+            try {
+                const docRef = await addDoc(collection(db, "ads"), newAd);
+                newAd.id = docRef.id;
+                allAds.unshift(newAd);
+                saveToLocalStorage();
+                alert('تم نشر الإعلان بنجاح في قاعدة البيانات!');
+                event.target.reset();
+                if(marker) { map.removeLayer(marker); marker = null; }
+                document.getElementById('coords-text').innerText = "اضغط على الخريطة لتحديد موقع العقار بدقة";
+                switchPage('home');
+                renderAllAds();
+            } catch (error) {
+                console.error("خطأ أثناء إضافة الإعلان: ", error);
+                alert('حدث خطأ أثناء حفظ الإعلان.');
+            }
         }
 
         function toBase64(file) {
@@ -925,20 +966,26 @@
             });
         }
 
-        function deleteAd(id, event) {
+        window.deleteAd = async function(id, event) {
             if(event) event.stopPropagation();
-            if (confirm('هل أنت متأكد من حذف هذا الإعلان؟')) {
-                allAds = allAds.filter(ad => ad.id !== id);
-                favorites = favorites.filter(fav => fav.id !== id);
-                saveToLocalStorage();
-                renderAllAds();
-                updateFavoritesView();
-                renderUserAds();
+            if (confirm('هل أنت متأكد من حذف هذا الإعلان من قاعدة البيانات؟')) {
+                try {
+                    await deleteDoc(doc(db, "ads", id));
+                    allAds = allAds.filter(ad => ad.id !== id);
+                    favorites = favorites.filter(fav => fav.id !== id);
+                    saveToLocalStorage();
+                    renderAllAds();
+                    updateFavoritesView();
+                    renderUserAds();
+                    alert('تم الحذف بنجاح.');
+                } catch (error) {
+                    console.error("خطأ في الحذف: ", error);
+                    alert('تعذر حذف الإعلان.');
+                }
             }
         }
 
         function saveToLocalStorage() {
-            localStorage.setItem('almawathiq_ads', JSON.stringify(allAds));
             localStorage.setItem('almawathiq_favs', JSON.stringify(favorites));
         }
 
@@ -960,22 +1007,22 @@
 
             allAds.forEach(ad => {
                 const isFav = favorites.some(f => f.id === ad.id);
-                const mediaHtml = ad.images.length > 0 ? 
+                const mediaHtml = (ad.images && ad.images.length > 0) ? 
                     `<img src="${ad.images[0]}" alt="${ad.title}">` : 
-                    (ad.videos.length > 0 ? `<video src="${ad.videos[0]}"></video>` : 'لا توجد صور');
+                    ((ad.videos && ad.videos.length > 0) ? `<video src="${ad.videos[0]}"></video>` : 'لا توجد صور');
 
                 const cardHtml = `
                     <div class="ad-card" data-type="${ad.type}" data-city="${ad.city}" data-price="${ad.price}" onclick="viewAdDetails('${ad.id}')">
-                        <button class="fav-btn" style="color: ${isFav ? 'var(--gold)' : 'inherit'};" onclick="toggleFavorite('${ad.id}', event)">♥</button>
+                        <button class="fav-btn" style="color: ${isFav ? 'var(--gold)' : 'inherit'};" onclick="toggleFavorite('${ad.id}', event)">♥️</button>
                         <button class="share-btn" onclick="shareAd('${ad.id}', event)">📤</button>
                         <div class="ad-img">${mediaHtml}</div>
                         <div class="ad-content">
                             <div class="ad-title">${ad.title}</div>
-                            <div class="ad-details">${ad.description.substring(0, 40)}...</div>
+                            <div class="ad-details">${ad.description ? ad.description.substring(0, 40) : ''}...</div>
                             <div style="font-size: 11px; color: var(--gold-light); margin-bottom: 8px;">المنطقة: ${ad.city}</div>
                             <div class="ad-footer">
-                                <span>${ad.price.toLocaleString()} ر.ق</span>
-                                <span class="views-badge">المشاهدات: ${ad.views}</span>
+                                <span>${ad.price ? ad.price.toLocaleString() : 0} ر.ق</span>
+                                <span class="views-badge">المشاهدات: ${ad.views || 0}</span>
                             </div>
                             <button class="btn-delete-ad" onclick="deleteAd('${ad.id}', event)">حذف الإعلان</button>
                         </div>
@@ -1001,14 +1048,14 @@
                     <div style="background: #111; padding: 10px; border-radius: 5px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
                         <div>
                             <strong style="color: var(--gold);">${ad.title}</strong>
-                            <div style="font-size: 11px; color: var(--text-muted);">${ad.city} - ${ad.price.toLocaleString()} ر.ق</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">${ad.city} - ${ad.price ? ad.price.toLocaleString() : 0} ر.ق</div>
                         </div>
                         <button class="btn-delete-ad" onclick="deleteAd('${ad.id}', event)">حذف</button>
                     </div>
                 `).join('');
         }
 
-        function toggleFavorite(adId, event) {
+        window.toggleFavorite = function(adId, event) {
             event.stopPropagation();
             const ad = allAds.find(a => a.id === adId);
             const index = favorites.findIndex(f => f.id === adId);
@@ -1023,17 +1070,17 @@
             container.innerHTML = favorites.length === 0 ? '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لم تقم بإضافة عقارات للمفضلة.</div>' :
                 favorites.map(ad => `
                     <div class="ad-card" onclick="viewAdDetails('${ad.id}')">
-                        <button class="fav-btn" style="color: var(--gold);" onclick="toggleFavorite('${ad.id}', event)">♥</button>
-                        <div class="ad-img"><img src="${ad.images[0]}" alt="${ad.title}"></div>
+                        <button class="fav-btn" style="color: var(--gold);" onclick="toggleFavorite('${ad.id}', event)">♥️</button>
+                        <div class="ad-img"><img src="${ad.images && ad.images[0] ? ad.images[0] : ''}" alt="${ad.title}"></div>
                         <div class="ad-content">
                             <div class="ad-title">${ad.title}</div>
-                            <div class="ad-footer"><span>${ad.price.toLocaleString()} ر.ق</span></div>
+                            <div class="ad-footer"><span>${ad.price ? ad.price.toLocaleString() : 0} ر.ق</span></div>
                         </div>
                     </div>
                 `).join('');
         }
 
-        function shareAd(adId, event) {
+        window.shareAd = function(adId, event) {
             event.stopPropagation();
             const ad = allAds.find(a => a.id === adId);
             if (ad && navigator.share) {
@@ -1047,29 +1094,41 @@
             }
         }
 
-        function viewAdDetails(adId) {
+        window.viewAdDetails = async function(adId) {
             const ad = allAds.find(a => a.id === adId);
             if (!ad) return;
             
-            ad.views += 1;
-            saveToLocalStorage();
+            // تحديث المشاهدات في قاعدة البيانات
+            try {
+                const adRef = doc(db, "ads", adId);
+                await updateDoc(adRef, {
+                    views: increment(1)
+                });
+                ad.views = (ad.views || 0) + 1;
+            } catch (e) {
+                console.log("خطأ في تحديث المشاهدات", e);
+            }
 
             document.getElementById('full-ad-title').innerText = ad.title;
             document.getElementById('full-ad-meta').innerText = `المنطقة: ${ad.city} | النوع: ${ad.type} | التاريخ: ${ad.date}`;
             document.getElementById('full-ad-desc').innerText = ad.description;
-            document.getElementById('full-ad-price').innerText = `${ad.price.toLocaleString()} ر.ق`;
-            document.getElementById('full-ad-views').innerText = `المشاهدات: ${ad.views}`;
+            document.getElementById('full-ad-price').innerText = `${ad.price ? ad.price.toLocaleString() : 0} ر.ق`;
+            document.getElementById('full-ad-views').innerText = `المشاهدات: ${ad.views || 0}`;
 
             const mediaContainer = document.getElementById('full-ad-media');
             mediaContainer.innerHTML = '';
             
-            ad.images.forEach(img => {
-                mediaContainer.innerHTML += `<div class="media-item"><img src="${img}" alt="صورة العقار"></div>`;
-            });
+            if (ad.images) {
+                ad.images.forEach(img => {
+                    mediaContainer.innerHTML += `<div class="media-item"><img src="${img}" alt="صورة العقار"></div>`;
+                });
+            }
             
-            ad.videos.forEach(vid => {
-                mediaContainer.innerHTML += `<div class="media-item"><video src="${vid}" controls></video></div>`;
-            });
+            if (ad.videos) {
+                ad.videos.forEach(vid => {
+                    mediaContainer.innerHTML += `<div class="media-item"><video src="${vid}" controls></video></div>`;
+                });
+            }
 
             switchPage('ad-details-page');
 
@@ -1095,7 +1154,7 @@
             }
         }
 
-        function applyFilters() {
+        window.applyFilters = function() {
             const selectedType = document.getElementById('filter-type').value;
             const selectedCity = document.getElementById('filter-city').value;
             const maxPrice = parseFloat(document.getElementById('filter-max-price').value) || Infinity;
@@ -1108,7 +1167,7 @@
             });
         }
 
-        function calculate() {
+        window.calculate = function() {
             const price = parseFloat(document.getElementById('price').value);
             const downpayment = parseFloat(document.getElementById('downpayment').value);
             const years = parseFloat(document.getElementById('years').value);
@@ -1123,8 +1182,8 @@
             }
         }
 
-        function calculateRent() {
-            const monthlyRent = parseFloat(document.getElementById('monthly-rent-input') ? document.getElementById('monthly-rent-input').value : document.getElementById('monthly-rent').value);
+        window.calculateRent = function() {
+            const monthlyRent = parseFloat(document.getElementById('monthly-rent').value);
             if (monthlyRent > 0) {
                 document.getElementById('rent-result').innerText = 'إجمالي الإيجار السنوي (12 شهر): ' + (monthlyRent * 12).toFixed(0) + ' ر.ق';
             } else {
