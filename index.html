@@ -352,6 +352,19 @@
             margin-top: 8px;
         }
 
+        .btn-edit-ad {
+            background-color: var(--gold-dark);
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 8px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
         .ad-full-page {
             max-width: 900px;
             margin: 0 auto;
@@ -420,7 +433,7 @@
         </nav>
         <div class="header-actions">
             <button id="account-btn" class="btn-outline" onclick="handleAccountClick()">تسجيل الدخول</button>
-            <button class="btn-gold" onclick="switchPage('add-ad')">إضافة إعلان</button>
+            <button class="btn-gold" onclick="prepareAddAd()">إضافة إعلان</button>
         </div>
     </header>
 
@@ -611,11 +624,12 @@
             <div id="news-grid">جاري تحميل الأخبار...</div>
         </div>
 
-        <!-- صفحة إضافة إعلان -->
+        <!-- صفحة إضافة / تعديل إعلان -->
         <div id="add-ad" class="page-view">
-            <div class="section-title">إضافة إعلان جديد</div>
+            <div class="section-title" id="form-page-title">إضافة إعلان جديد</div>
             <div class="ad-form" style="max-width: 800px; margin: 0 auto;">
-                <form id="adForm" onsubmit="addNewAd(event)">
+                <form id="adForm" onsubmit="saveAd(event)">
+                    <input type="hidden" id="editing-ad-id">
                     <input type="text" id="ad-title-input" placeholder="عنوان الإعلان" aria-label="عنوان الإعلان" required>
                     
                     <textarea id="ad-desc-input" placeholder="وصف العقار" rows="4" aria-label="وصف العقار" required></textarea>
@@ -676,7 +690,7 @@
                     <div style="color: var(--text-color); margin-top: 15px; font-weight: bold;">رفع الفيديوهات (بحد أقصى 3 فيديوهات):</div>
                     <input type="file" id="ad-videos-input" accept="video/*" multiple aria-label="رفع الفيديوهات">
                     
-                    <button type="submit" class="btn-gold" style="width: 100%; margin-top: 20px;">نشر الإعلان</button>
+                    <button type="submit" class="btn-gold" style="width: 100%; margin-top: 20px;" id="submit-btn-text">نشر الإعلان</button>
                 </form>
             </div>
         </div>
@@ -860,25 +874,72 @@
             }
         }
 
-        window.addNewAd = async function(event) {
+        window.prepareAddAd = function() {
+            document.getElementById('adForm').reset();
+            document.getElementById('editing-ad-id').value = '';
+            document.getElementById('form-page-title').innerText = "إضافة إعلان جديد";
+            document.getElementById('submit-btn-text').innerText = "نشر الإعلان";
+            if(marker) { map.removeLayer(marker); marker = null; }
+            document.getElementById('coords-text').innerText = "اضغط على الخريطة لتحديد موقع العقار بدقة";
+            switchPage('add-ad');
+        }
+
+        window.editAd = function(id, event) {
+            if(event) event.stopPropagation();
+            const ad = allAds.find(a => a.id === id);
+            if(!ad) return;
+
+            document.getElementById('editing-ad-id').value = ad.id;
+            document.getElementById('ad-title-input').value = ad.title || '';
+            document.getElementById('ad-desc-input').value = ad.description || '';
+            document.getElementById('ad-purpose-input').value = ad.purpose || '';
+            document.getElementById('ad-type-input').value = ad.type || '';
+            document.getElementById('ad-price-input').value = ad.price || '';
+            document.getElementById('ad-city-input').value = ad.city || '';
+            document.getElementById('ad-lat').value = ad.lat || '';
+            document.getElementById('ad-lng').value = ad.lng || '';
+
+            document.getElementById('form-page-title').innerText = "تعديل الإعلان";
+            document.getElementById('submit-btn-text').innerText = "حفظ التعديلات";
+
+            if (ad.lat && ad.lng) {
+                setMarkerPosition(parseFloat(ad.lat), parseFloat(ad.lng));
+            } else if(marker) {
+                map.removeLayer(marker);
+                marker = null;
+                document.getElementById('coords-text').innerText = "اضغط على الخريطة لتحديد موقع العقار بدقة";
+            }
+
+            switchPage('add-ad');
+        }
+
+        window.saveAd = async function(event) {
             event.preventDefault();
 
+            const editingId = document.getElementById('editing-ad-id').value;
             const imageFiles = document.getElementById('ad-images-input').files;
             const videoFiles = document.getElementById('ad-videos-input').files;
 
-            const images = [];
+            let images = [];
+            let videos = [];
+
+            if (editingId) {
+                const existingAd = allAds.find(a => a.id === editingId);
+                images = existingAd.images || [];
+                videos = existingAd.videos || [];
+            }
+
             for (let file of imageFiles) {
                 const base64 = await toBase64(file);
                 images.push(base64);
             }
 
-            const videos = [];
             for (let file of videoFiles) {
                 const base64 = await toBase64(file);
                 videos.push(base64);
             }
 
-            const newAd = {
+            const adData = {
                 title: document.getElementById('ad-title-input').value,
                 description: document.getElementById('ad-desc-input').value,
                 purpose: document.getElementById('ad-purpose-input').value,
@@ -889,22 +950,32 @@
                 lng: document.getElementById('ad-lng').value || "",
                 images: images,
                 videos: videos,
-                views: 0,
                 date: new Date().toLocaleDateString('ar-QA')
             };
 
             try {
-                const docRef = await addDoc(collection(db, "abdullah"), newAd);
-                newAd.id = docRef.id;
-                allAds.unshift(newAd);
-                alert('تم نشر الإعلان بنجاح في قاعدة البيانات!');
+                if (editingId) {
+                    const adRef = doc(db, "abdullah", editingId);
+                    await updateDoc(adRef, adData);
+                    const index = allAds.findIndex(a => a.id === editingId);
+                    if (index > -1) {
+                        allAds[index] = { id: editingId, ...allAds[index], ...adData };
+                    }
+                    alert('تم تعديل الإعلان بنجاح!');
+                } else {
+                    adData.views = 0;
+                    const docRef = await addDoc(collection(db, "abdullah"), adData);
+                    adData.id = docRef.id;
+                    allAds.unshift(adData);
+                    alert('تم نشر الإعلان بنجاح في قاعدة البيانات!');
+                }
+
                 event.target.reset();
                 if(marker) { map.removeLayer(marker); marker = null; }
-                document.getElementById('coords-text').innerText = "اضغط على الخريطة لتحديد موقع العقار بدقة";
                 switchPage('home');
                 renderAllAds();
             } catch (error) {
-                console.error("خطأ أثناء إضافة الإعلان: ", error);
+                console.error("خطأ أثناء حفظ الإعلان: ", error);
                 alert('حدث خطأ أثناء حفظ الإعلان.');
             }
         }
@@ -976,7 +1047,10 @@
                                 <span>${ad.price ? ad.price.toLocaleString() : 0} ر.ق</span>
                                 <span class="views-badge">المشاهدات: ${ad.views || 0}</span>
                             </div>
-                            <button class="btn-delete-ad" onclick="deleteAd('${ad.id}', event)">حذف الإعلان</button>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="btn-edit-ad" onclick="editAd('${ad.id}', event)">تعديل</button>
+                                <button class="btn-delete-ad" onclick="deleteAd('${ad.id}', event)">حذف</button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1002,7 +1076,10 @@
                             <strong style="color: var(--gold);">${ad.title}</strong>
                             <div style="font-size: 11px; color: var(--text-muted);">${ad.city} - ${ad.price ? ad.price.toLocaleString() : 0} ر.ق</div>
                         </div>
-                        <button class="btn-delete-ad" onclick="deleteAd('${ad.id}', event)">حذف</button>
+                        <div style="display: flex; gap: 5px;">
+                            <button class="btn-edit-ad" onclick="editAd('${ad.id}', event)" style="margin-top:0;">تعديل</button>
+                            <button class="btn-delete-ad" onclick="deleteAd('${ad.id}', event)" style="margin-top:0;">حذف</button>
+                        </div>
                     </div>
                 `).join('');
         }
