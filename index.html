@@ -1096,3 +1096,537 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المواثيق العقارية</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --bg-color: #0b0b0b;
+            --card-bg: #141414;
+            --gold: #d4af37;
+            --gold-light: #f3e5ab;
+            --gold-dark: #aa8c2c;
+            --text-color: #ffffff;
+            --text-muted: #aaaaaa;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+            border-bottom: 2px solid var(--gold);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            position: relative;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: absolute;
+            right: 40px;
+        }
+
+        .logo-img {
+            width: 75px;
+            height: 75px;
+            object-fit: contain;
+            border-radius: 6px;
+            border: 1px solid var(--gold-dark);
+            background: #000;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        }
+
+        .logo-text-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            line-height: 1.2;
+        }
+
+        .logo-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        nav {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+
+        nav a:hover {
+            color: var(--gold);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+            transition: 0.3s;
+        }
+
+        .btn-gold:hover {
+            background: var(--gold-light);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.7);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 8px 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            color: var(--gold);
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .about-section, .calc-section, .filter-section, .auth-box, .ad-form, .profile-box, .ad-full-page {
+            background-color: var(--card-bg);
+            border: 1px solid var(--gold-dark);
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .filter-grid, .calc-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .filter-grid select, .filter-grid input, .calc-form input {
+            width: 100%;
+            padding: 10px;
+            background-color: #222;
+            border: 1px solid #444;
+            color: var(--text-color);
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .calc-result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .ads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .ad-card {
+            background-color: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: 0.3s;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .ad-card:hover {
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .ad-img {
+            width: 100%;
+            height: 180px;
+            background-color: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ad-img img, .ad-img video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .fav-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
+            padding: 5px 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 10;
+        }
+
+        .fav-btn:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .ad-content {
+            padding: 20px;
+        }
+
+        .ad-title {
+            color: var(--gold);
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .ad-details {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .ad-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #222;
+            padding-top: 10px;
+            font-size: 13px;
+            color: var(--gold-light);
+        }
+
+        .views-badge {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--gold-dark);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .page-view {
+            display: none;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        .auth-box input, .ad-form input, .ad-form textarea, .ad-form select, .profile-box input {
+            display: block;
+            margin: 15px auto;
+            width: 100%;
+            padding: 12px;
+            background-color: #222;
+            border: 1px solid #444;
+            color: var(--text-color);
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        #map {
+            height: 300px;
+            width: 100%;
+            border: 1px solid #444;
+            border-radius: 5px;
+            margin: 15px 0;
+            z-index: 1;
+        }
+
+        .coordinates-info {
+            font-size: 13px;
+            color: var(--gold-light);
+            margin-bottom: 15px;
+        }
+
+        .profile-img-upload {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #222;
+            border: 2px dashed var(--gold);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .profile-img-upload img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .btn-delete-ad {
+            background-color: #a94442;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-delete-ad:hover {
+            background-color: #c9302c;
+        }
+
+        .ad-full-page {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .media-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .media-item {
+            height: 250px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+
+        .media-item img, .media-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background-color: #050505;
+            color: var(--text-muted);
+            border-top: 1px solid #222;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <img src="" alt="شعار المواثيق العقارية" class="logo-img" id="brand-logo">
+            <div class="logo-text-group">
+                <div class="logo">المواثيق العقارية</div>
+                <div class="logo-sub">ALMAWATHIQ REAL ESTATE</div>
+            </div>
+        </div>
+        <nav>
+            <a href="#" onclick="switchPage('home')">الرئيسية</a>
+            <a href="#" onclick="switchPage('rent')">بيوت الإيجار</a>
+            <a href="#" onclick="switchPage('sale')">بيوت للبيع</a>
+        </nav>
+        <div class="header-actions">
+            <button id="account-btn" class="btn-outline" onclick="handleAccountClick()">تسجيل الدخول</button>
+            <button class="btn-gold" onclick="switchPage('add-ad')">إضافة إعلان</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- صفحة الرئيسية -->
+        <div id="home" class="page-view active">
+            <div class="about-section">
+                <h2 style="color: var(--gold); margin-top: 0;">عن الشركة</h2>
+                <p>مرحباً بك في المواثيق العقارية. نحن نبتكر أفضل الحلول العقارية ونوفر منصة متكاملة لعرض وطلب العقارات بأعلى معايير الجودة والفخامة في دولة قطر.</p>
+            </div>
+
+            <div class="section-title">البحث المتقدم</div>
+            <div class="filter-section">
+                <div class="filter-grid">
+                    <select id="filter-type">
+                        <option value="">نوع العقار (الكل)</option>
+                        <option value="villa">فيلا</option>
+                        <option value="apartment">شقة</option>
+                        <option value="land">أرض</option>
+                        <option value="chalet">شاليه</option>
+                        <option value="commercial">تجاري</option>
+                    </select>
+                    <select id="filter-city">
+                        <option value="">المنطقة/البلدية (الكل)</option>
+                        <option value="الدوحة">الدوحة</option>
+                        <option value="الريان">الريان</option>
+                        <option value="الوكرة">الوكرة</option>
+                        <option value="الخور">الخور والذكيرة</option>
+                        <option value="الضعاين">الضعاين</option>
+                        <option value="الشمال">الشمال</option>
+                        <option value="الشيحانية">الشيحانية</option>
+                        <option value="أم صلال">أم صلال</option>
+                        <option value="مسيعيد">مسيعيد</option>
+                        <option value="دخان">دخان</option>
+                        <option value="لوسيل">لوسيل</option>
+                        <option value="اللؤلؤة">اللؤلؤة</option>
+                        <option value="القصار">القصار</option>
+                        <option value="الوعب">الوعب</option>
+                        <option value="المرخية">المرخية</option>
+                        <option value="عين خالد">عين خالد</option>
+                        <option value="معيذر">معيذر</option>
+                        <option value="أبو هامور">أبو هامور</option>
+                    </select>
+                    <input type="number" id="filter-max-price" placeholder="الحد الأقصى للسعر (ر.ق)">
+                    <button class="btn-gold" onclick="applyFilters()">بحث وتصفية</button>
+                </div>
+            </div>
+
+            <div class="section-title">آخر 3 إعلانات عقارية</div>
+            <div class="ads-grid" id="main-ads-grid">
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات منشورة حالياً. أضف إعلانك الأول!</div>
+            </div>
+
+            <div class="section-title">حاسبة التمويل العقاري</div>
+            <div class="calc-section">
+                <div class="calc-form">
+                    <div>
+                        <label>سعر العقار (ر.ق):</label>
+                        <input type="number" id="price" placeholder="أدخل سعر العقار" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label>الدفعة الأولى (ر.ق):</label>
+                        <input type="number" id="downpayment" placeholder="أدخل الدفعة الأولى" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label>مدة القرض (سنوات):</label>
+                        <input type="number" id="years" placeholder="أدخل مدة القرض" oninput="calculate()">
+                    </div>
+                </div>
+                <div class="calc-result" id="result">القسط الشهري التقديري: 0 ر.ق</div>
+            </div>
+        </div>
+
+        <!-- باقي الصفحات وصفحة عرض الإعلان -->
+        <div id="rent" class="page-view">
+            <div class="section-title">بيوت للإيجار</div>
+            <div class="ads-grid" id="rent-ads-grid"></div>
+        </div>
+        <div id="sale" class="page-view">
+            <div class="section-title">بيوت للبيع</div>
+            <div class="ads-grid" id="sale-ads-grid"></div>
+        </div>
+        <div id="auth" class="page-view">
+            <div class="section-title">تسجيل الدخول برقم الجوال</div>
+            <div class="auth-box"><form onsubmit="loginUser(event)"><input type="tel" id="login-phone" placeholder="رقم الجوال" required><button type="submit" class="btn-gold">تسجيل الدخول</button></form></div>
+        </div>
+        <div id="add-ad" class="page-view">
+            <div class="section-title">إضافة إعلان جديد</div>
+            <div class="ad-form"><form onsubmit="addNewAd(event)"><input type="text" id="ad-title-input" placeholder="العنوان" required><textarea id="ad-desc-input" placeholder="الوصف" required></textarea><select id="ad-purpose-input"><option value="sale">للبيع</option><option value="rent">للإيجار</option></select><select id="ad-type-input"><option value="villa">فيلا</option><option value="apartment">شقة</option></select><input type="number" id="ad-price-input" placeholder="السعر" required><select id="ad-city-input"><option value="الدوحة">الدوحة</option><option value="الريان">الريان</option></select><div id="map"></div><input type="hidden" id="ad-lat"><input type="hidden" id="ad-lng"><button type="submit" class="btn-gold">نشر الإعلان</button></form></div>
+        </div>
+        <div id="ad-details-page" class="page-view">
+            <button class="btn-outline" onclick="switchPage('home')">العودة</button>
+            <div class="ad-full-page"><h2 id="full-ad-title"></h2><div id="full-ad-meta"></div><div id="full-ad-desc"></div><div id="full-ad-price"></div><div id="full-ad-views"></div><div id="full-ad-map"></div></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>جميع الحقوق محفوظة &copy; المواثيق العقارية 2026</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // كود الجافاسكريبت المدمج للتحكم بالصفحة وتخزين البيانات
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+        function calculate() {
+            let p = parseFloat(document.getElementById('price').value) || 0;
+            let dp = parseFloat(document.getElementById('downpayment').value) || 0;
+            let y = parseFloat(document.getElementById('years').value) || 1;
+            let loan = p - dp;
+            let months = y * 12;
+            let res = months > 0 ? (loan / months).toFixed(2) : 0;
+            document.getElementById('result').innerText = "القسط الشهري التقديري: " + res + " ر.ق";
+        }
+        function handleAccountClick() {
+            switchPage('auth');
+        }
+        function loginUser(e) {
+            e.preventDefault();
+            alert('تم تسجيل الدخول بنجاح');
+            switchPage('home');
+        }
+        function addNewAd(e) {
+            e.preventDefault();
+            alert('تم نشر الإعلان بنجاح');
+            switchPage('home');
+        }
+        function applyFilters() {
+            alert('تم تطبيق التصفية');
+        }
+    </script>
+</body>
+</html>
