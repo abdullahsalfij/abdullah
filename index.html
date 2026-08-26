@@ -405,19 +405,6 @@
             font-size: 14px;
         }
 
-        .social-links a {
-            color: var(--gold);
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 18px;
-            transition: 0.3s;
-        }
-
-        .social-links a:hover {
-            color: var(--gold-light);
-            text-shadow: 0 0 5px var(--gold);
-        }
-
         .contact-section a {
             display: flex;
             align-items: center;
@@ -734,9 +721,9 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        let map, marker, fullMap;
-        let allAds = [];
-        let favorites = [];
+        let map, marker, fullMap, fullMarker;
+        let allAds = JSON.parse(localStorage.getItem('almawathiq_ads')) || [];
+        let favorites = JSON.parse(localStorage.getItem('almawathiq_favs')) || [];
         let isLoggedIn = false;
         let currentUser = { name: '', phone: '' };
 
@@ -784,6 +771,8 @@
         window.onload = function() {
             initMap();
             fetchNews();
+            renderAllAds();
+            updateFavoritesView();
         };
 
         function switchPage(pageId) {
@@ -872,6 +861,7 @@
             };
 
             allAds.unshift(newAd);
+            saveToLocalStorage();
             alert('تم نشر الإعلان بنجاح!');
             event.target.reset();
             if(marker) { map.removeLayer(marker); marker = null; }
@@ -884,10 +874,16 @@
             if (confirm('هل أنت متأكد من حذف هذا الإعلان؟')) {
                 allAds = allAds.filter(ad => ad.id !== id);
                 favorites = favorites.filter(fav => fav.id !== id);
+                saveToLocalStorage();
                 renderAllAds();
                 updateFavoritesView();
                 renderUserAds();
             }
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('almawathiq_ads', JSON.stringify(allAds));
+            localStorage.setItem('almawathiq_favs', JSON.stringify(favorites));
         }
 
         function renderAllAds() {
@@ -896,10 +892,11 @@
             const saleContainer = document.getElementById('sale-ads-grid');
 
             if (allAds.length === 0) {
-                const emptyMsg = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات منشورة حالياً.</div>';
+                const emptyMsg = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات منشورة حالياً. أضف إعلانك الأول!</div>';
                 mainContainer.innerHTML = emptyMsg;
-                rentContainer.innerHTML = emptyMsg;
-                saleContainer.innerHTML = emptyMsg;
+                rentContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات إيجار حالياً.</div>';
+                saleContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات بيع حالياً.</div>';
+                renderUserAds();
                 return;
             }
 
@@ -959,6 +956,7 @@
             const ad = allAds.find(a => a.id === adId);
             const index = favorites.findIndex(f => f.id === adId);
             index > -1 ? favorites.splice(index, 1) : favorites.push(ad);
+            saveToLocalStorage();
             renderAllAds();
             updateFavoritesView();
         }
@@ -983,6 +981,7 @@
             if (!ad) return;
             
             ad.views += 1;
+            saveToLocalStorage();
 
             document.getElementById('full-ad-title').innerText = ad.title;
             document.getElementById('full-ad-meta').innerText = `المنطقة: ${ad.city} | النوع: ${ad.type} | التاريخ: ${ad.date}`;
@@ -1005,15 +1004,22 @@
 
             if (ad.lat && ad.lng) {
                 setTimeout(() => {
+                    const lat = parseFloat(ad.lat);
+                    const lng = parseFloat(ad.lng);
                     if (!fullMap) {
-                        fullMap = L.map('full-ad-map').setView([parseFloat(ad.lat), parseFloat(ad.lng)], 14);
+                        fullMap = L.map('full-ad-map').setView([lat, lng], 14);
                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                             attribution: '&copy; OpenStreetMap contributors'
                         }).addTo(fullMap);
                     } else {
-                        fullMap.setView([parseFloat(ad.lat), parseFloat(ad.lng)], 14);
+                        fullMap.invalidateSize();
+                        fullMap.setView([lat, lng], 14);
                     }
-                    L.marker([parseFloat(ad.lat), parseFloat(ad.lng)]).addTo(fullMap);
+                    if (fullMarker) {
+                        fullMarker.setLatLng([lat, lng]);
+                    } else {
+                        fullMarker = L.marker([lat, lng]).addTo(fullMap);
+                    }
                 }, 300);
             }
         }
