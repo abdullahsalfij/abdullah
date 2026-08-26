@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المواثيق العقارية</title>
+    <style>
+        :root {
+            --bg-color: #0b0b0b;
+            --card-bg: #141414;
+            --gold: #d4af37;
+            --gold-light: #f3e5ab;
+            --gold-dark: #aa8c2c;
+            --text-color: #ffffff;
+            --text-muted: #aaaaaa;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+            border-bottom: 2px solid var(--gold);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-img {
+            width: 75px;
+            height: 75px;
+            object-fit: contain;
+            border-radius: 6px;
+            border: 1px solid var(--gold-dark);
+            background: #000;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+            cursor: pointer;
+        }
+
+        .logo-text-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            line-height: 1.2;
+        }
+
+        .logo-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        nav {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+
+        nav a:hover {
+            color: var(--gold);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+            transition: 0.3s;
+        }
+
+        .btn-gold:hover {
+            background: var(--gold-light);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.7);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 8px 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            color: var(--gold);
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .about-section, .stats-section, .calc-section, .filter-section, .auth-box, .ad-form, .profile-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--gold-dark);
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .filter-grid, .calc-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .filter-grid select, .filter-grid input, .calc-form input {
+            width: 100%;
+            padding: 10px;
+            background-color: #222;
+            border: 1px solid #444;
+            color: var(--text-color);
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .calc-result {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .ads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .ad-card {
+            background-color: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .ad-card:hover {
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .ad-img {
+            width: 100%;
+            height: 180px;
+            background-color: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            position: relative;
+        }
+
+        .fav-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
+            padding: 5px 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .fav-btn:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .ad-content {
+            padding: 20px;
+        }
+
+        .ad-title {
+            color: var(--gold);
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .ad-details {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .ad-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #222;
+            padding-top: 10px;
+            font-size: 13px;
+            color: var(--gold-light);
+        }
+
+        .views-badge {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--gold-dark);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .page-view {
+            display: none;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        .auth-box input, .ad-form input, .ad-form textarea, .ad-form select, .profile-box input {
+            display: block;
+            margin: 15px auto;
+            width: 100%;
+            padding: 12px;
+            background-color: #222;
+            border: 1px solid #444;
+            color: var(--text-color);
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .profile-img-upload {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #222;
+            border: 2px dashed var(--gold);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .profile-img-upload img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .news-item {
+            background: #111;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border-right: 2px solid var(--gold);
+        }
+
+        .news-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--gold);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .news-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .news-date {
+            font-size: 12px;
+            color: #888;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background-color: #050505;
+            color: var(--text-muted);
+            border-top: 1px solid #222;
+            font-size: 14px;
+        }
+
+        .social-links a {
+            color: var(--gold);
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--gold-light);
+            text-shadow: 0 0 5px var(--gold);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <img src="" alt="شعار المواثيق العقارية" class="logo-img" id="brand-logo" onclick="document.getElementById('brand-logo-input').click()" title="انقر لتغيير الشعار">
+            <input type="file" id="brand-logo-input" accept="image/*" style="display: none;" onchange="loadBrandLogo(event)">
+            <div class="logo-text-group">
+                <div class="logo">المواثيق العقارية</div>
+                <div class="logo-sub">ALMAWATHIQ REAL ESTATE</div>
+            </div>
+        </div>
+        <nav>
+            <a href="#" onclick="switchPage('home')">الرئيسية</a>
+            <a href="#" onclick="switchPage('rent')">بيوت الإيجار</a>
+            <a href="#" onclick="switchPage('sale')">بيوت للبيع</a>
+            <a href="#" onclick="switchPage('news')">الأخبار العقارية</a>
+            <a href="#" onclick="switchPage('favorites')">المفضلة</a>
+        </nav>
+        <div class="header-actions">
+            <button id="account-btn" class="btn-outline" onclick="handleAccountClick()">تسجيل الدخول</button>
+            <button class="btn-gold" onclick="switchPage('add-ad')">إضافة إعلان</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- صفحة الرئيسية -->
+        <div id="home" class="page-view active">
+            <div class="about-section">
+                <h2 style="color: var(--gold); margin-top: 0;">عن الشركة</h2>
+                <p>مرحباً بك في المواثيق العقارية. نحن نبتكر أفضل الحلول العقارية ونوفر منصة متكاملة لعرض وطلب العقارات بأعلى معايير الجودة والفخامة في دولة قطر.</p>
+            </div>
+
+            <!-- البحث المتقدم (أول شيء بعد عن الشركة) -->
+            <div class="section-title">البحث المتقدم</div>
+            <div class="filter-section">
+                <div class="filter-grid">
+                    <select id="filter-type">
+                        <option value="">نوع العقار (الكل)</option>
+                        <option value="villa">فيلا</option>
+                        <option value="apartment">شقة</option>
+                        <option value="land">أرض</option>
+                        <option value="chalet">شاليه</option>
+                        <option value="commercial">تجاري</option>
+                    </select>
+                    <select id="filter-city">
+                        <option value="">المنطقة (الكل)</option>
+                        <option value="doha">الدوحة</option>
+                        <option value="wakrah">الوكرة</option>
+                        <option value="rayyan">الريان</option>
+                        <option value="khor">الخور</option>
+                        <option value="daayen">الضعاين</option>
+                        <option value="shamal">الشمال</option>
+                        <option value="shahaniya">الشحانية</option>
+                        <option value="ummsalal">أم صلال</option>
+                        <option value="mesaieed">مسيعيد</option>
+                    </select>
+                    <input type="number" id="filter-max-price" placeholder="الحد الأقصى للسعر (ر.ق)">
+                    <button class="btn-gold" onclick="applyFilters()">بحث وتصفية</button>
+                </div>
+            </div>
+
+            <!-- الإعلانات المميزة -->
+            <div class="section-title">الإعلانات المميزة</div>
+            <div class="ads-grid" id="main-ads-grid">
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات مميزة حالياً.</div>
+            </div>
+
+            <!-- متوسط أسعار العقارات في قطر -->
+            <div class="section-title">متوسط أسعار العقارات في قطر</div>
+            <div class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">12,000 ر.ق</div>
+                        <div>متوسط سعر المتر (الدوحة)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">9,000 ر.ق</div>
+                        <div>متوسط سعر المتر (الوكرة)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">8,000 ر.ق</div>
+                        <div>متوسط سعر المتر (الريان)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">10,000 ر.ق</div>
+                        <div>متوسط سعر المتر (الخور)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- حاسبة التمويل العقاري -->
+            <div class="section-title">حاسبة التمويل العقاري</div>
+            <div class="calc-section">
+                <div class="calc-form">
+                    <div>
+                        <label>سعر العقار (ر.ق):</label>
+                        <input type="number" id="price" placeholder="أدخل سعر العقار" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label>الدفعة الأولى (ر.ق):</label>
+                        <input type="number" id="downpayment" placeholder="أدخل الدفعة الأولى" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label>مدة القرض (سنوات):</label>
+                        <input type="number" id="years" placeholder="أدخل مدة القرض" oninput="calculate()">
+                    </div>
+                </div>
+                <div class="calc-result" id="result">القسط الشهري التقديري: 0 ر.ق</div>
+            </div>
+
+            <!-- حاسبة الإيجار -->
+            <div class="section-title">حاسبة الإيجار السنوي</div>
+            <div class="calc-section">
+                <div class="calc-form">
+                    <div>
+                        <label>الإيجار الشهري (ر.ق):</label>
+                        <input type="number" id="monthly-rent" placeholder="أدخل الإيجار الشهري" oninput="calculateRent()">
+                    </div>
+                </div>
+                <div class="calc-result" id="rent-result">إجمالي الإيجار السنوي (12 شهر): 0 ر.ق</div>
+            </div>
+        </div>
+
+        <!-- صفحة بيوت الإيجار -->
+        <div id="rent" class="page-view">
+            <div class="section-title">بيوت للإيجار</div>
+            <div class="ads-grid">
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات إيجار حالياً.</div>
+            </div>
+        </div>
+
+        <!-- صفحة بيوت للبيع -->
+        <div id="sale" class="page-view">
+            <div class="section-title">بيوت للبيع</div>
+            <div class="ads-grid">
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات بيع حالياً.</div>
+            </div>
+        </div>
+
+        <!-- صفحة المفضلة -->
+        <div id="favorites" class="page-view">
+            <div class="section-title">العقارات المفضلة لديك</div>
+            <div class="ads-grid" id="fav-container">
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لم تقم بإضافة أي عقارات للمفضلة حتى الآن.</div>
+            </div>
+        </div>
+
+        <!-- صفحة تسجيل الدخول برقم الجوال -->
+        <div id="auth" class="page-view">
+            <div class="section-title">تسجيل الدخول برقم الجوال</div>
+            <div style="max-width: 400px; margin: 0 auto;">
+                <div class="auth-box">
+                    <form onsubmit="loginUser(event)">
+                        <input type="tel" id="login-phone" placeholder="رقم الجوال (مثال: +974...)" required>
+                        <button type="submit" class="btn-gold" style="width: 100%; margin-top: 15px;">تسجيل الدخول</button>
+                    </form>
+                    <p style="text-align: center; margin-top: 20px; color: var(--text-muted);">
+                        ليس لديك حساب؟ <a href="#" onclick="switchPage('register')" style="color: var(--gold);">إنشاء حساب جديد</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- صفحة إنشاء الحساب -->
+        <div id="register" class="page-view">
+            <div class="section-title">إنشاء حساب جديد</div>
+            <div style="max-width: 600px; margin: 0 auto;">
+                <div class="auth-box">
+                    <form onsubmit="registerUser(event)">
+                        <div class="profile-img-upload" onclick="document.getElementById('register-pic-input').click()">
+                            <span id="upload-text">صورة شخصية</span>
+                            <img id="register-img-preview" src="" alt="الصورة الشخصية">
+                        </div>
+                        <input type="file" id="register-pic-input" accept="image/*" style="display: none;" onchange="loadRegisterPic(event)">
+
+                        <input type="text" id="reg-name" placeholder="الاسم الكامل" required>
+                        <input type="tel" id="reg-phone" placeholder="رقم الجوال (مثال: +974...)" required>
+                        <button type="submit" class="btn-gold" style="width: 100%; margin-top: 15px;">إنشاء حساب</button>
+                    </form>
+                    <p style="text-align: center; margin-top: 20px; color: var(--text-muted);">
+                        لديك حساب بالفعل؟ <a href="#" onclick="switchPage('auth')" style="color: var(--gold);">تسجيل الدخول</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- صفحة الملف التعريفي -->
+        <div id="profile" class="page-view">
+            <div class="section-title">الملف التعريفي</div>
+            <div class="profile-box" style="max-width: 600px; margin: 0 auto; text-align: center;">
+                <div class="profile-img-upload">
+                    <img id="profile-img-preview" src="" alt="الصورة الشخصية" style="display: block;">
+                </div>
+                
+                <h3 id="profile-name" style="color: var(--gold); margin-bottom: 5px;">اسم المستخدم</h3>
+                <p id="profile-phone" style="color: var(--text-muted); margin-top: 0;">+97400000000</p>
+
+                <div style="margin-top: 30px; text-align: right;">
+                    <h4 style="color: var(--gold); border-bottom: 1px solid #333; padding-bottom: 8px;">إعلاناتي</h4>
+                    <p style="color: var(--text-muted);">لا توجد إعلانات مضافة حالياً.</p>
+                </div>
+
+                <button class="btn-outline" onclick="logoutUser()" style="margin-top: 30px; width: 100%;">تسجيل الخروج</button>
+            </div>
+        </div>
+
+        <!-- صفحة الأخبار العقارية -->
+        <div id="news" class="page-view">
+            <div class="section-title">أخبار العقارات في قطر (آخر 14 يوماً)</div>
+            <div id="news-grid">جاري تحميل الأخبار...</div>
+        </div>
+
+        <!-- صفحة إضافة إعلان -->
+        <div id="add-ad" class="page-view">
+            <div class="section-title">إضافة إعلان جديد</div>
+            <div class="ad-form" style="max-width: 800px; margin: 0 auto;">
+                <form onsubmit="alert('تم إرسال الإعلان للمراجعة بنجاح'); return false;">
+                    <input type="text" placeholder="عنوان الإعلان" required>
+                    <textarea placeholder="وصف العقار" rows="4" required></textarea>
+                    <input type="number" placeholder="السعر (ر.ق)" required>
+                    <input type="text" placeholder="الموقع / المنطقة" required>
+                    
+                    <div style="color: var(--text-color); margin-top: 15px; font-weight: bold;">رفع الصور (بحد أقصى 10 صور):</div>
+                    <input type="file" accept="image/*" multiple>
+                    
+                    <div style="color: var(--text-color); margin-top: 15px; font-weight: bold;">رفع الفيديوهات (بحد أقصى 3 فيديوهات):</div>
+                    <input type="file" accept="video/*" multiple>
+                    
+                    <button type="submit" class="btn-gold" style="width: 100%; margin-top: 20px;">نشر الإعلان</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://wa.me/97433293328" target="_blank">تواصل معنا عبر واتساب</a>
+            <a href="https://www.instagram.com/abds_31/" target="_blank">تابعنا على إنستقرام</a>
+        </div>
+        <p style="margin-top: 10px; font-size: 13px; color: var(--gold-light);">س.ت: 174023 &bull; C.R.No: 174023</p>
+        <p style="margin-top: 10px;">جميع الحقوق محفوظة &copy; 2026 - المواثيق العقارية</p>
+    </footer>
+
+    <script>
+        let isLoggedIn = false;
+        let currentUser = { name: "عبدالله", phone: "+97433293328", pic: "" };
+
+        function loadBrandLogo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('brand-logo').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function switchPage(pageId) {
+            const pages = document.querySelectorAll('.page-view');
+            pages.forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function handleAccountClick() {
+            if (isLoggedIn) {
+                switchPage('profile');
+            } else {
+                switchPage('auth');
+            }
+        }
+
+        function loginUser(event) {
+            event.preventDefault();
+            const phoneInput = document.getElementById('login-phone').value;
+            currentUser.phone = phoneInput;
+            currentUser.name = "مستخدم الجوال";
+            
+            isLoggedIn = true;
+            document.getElementById('account-btn').innerText = "الملف التعريفي";
+            updateProfileView();
+            switchPage('profile');
+            alert('تم تسجيل الدخول بنجاح!');
+        }
+
+        function registerUser(event) {
+            event.preventDefault();
+            const nameInput = document.getElementById('reg-name').value;
+            const phoneInput = document.getElementById('reg-phone').value;
+            currentUser.name = nameInput;
+            currentUser.phone = phoneInput;
+
+            isLoggedIn = true;
+            document.getElementById('account-btn').innerText = "الملف التعريفي";
+            updateProfileView();
+            switchPage('profile');
+            alert('تم إنشاء الحساب وتسجيل الدخول بنجاح!');
+        }
+
+        function logoutUser() {
+            isLoggedIn = false;
+            document.getElementById('account-btn').innerText = "تسجيل الدخول";
+            document.getElementById('register-img-preview').style.display = 'none';
+            document.getElementById('upload-text').style.display = 'flex';
+            document.getElementById('register-pic-input').value = '';
+            
+            switchPage('home');
+            alert('تم تسجيل الخروج بنجاح');
+        }
+
+        function updateProfileView() {
+            document.getElementById('profile-name').innerText = currentUser.name;
+            document.getElementById('profile-phone').innerText = currentUser.phone;
+            
+            const profilePicPreview = document.getElementById('profile-img-preview');
+            const registerPicPreview = document.getElementById('register-img-preview');
+            
+            if (registerPicPreview.src && registerPicPreview.src !== window.location.href) {
+                profilePicPreview.src = registerPicPreview.src;
+                profilePicPreview.style.display = 'block';
+            }
+        }
+
+        function loadRegisterPic(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgPreview = document.getElementById('register-img-preview');
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'block';
+                    document.getElementById('upload-text').style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function calculate() {
+            const price = parseFloat(document.getElementById('price').value);
+            const downpayment = parseFloat(document.getElementById('downpayment').value);
+            const years = parseFloat(document.getElementById('years').value);
+
+            if (price > 0 && years > 0) {
+                const loanAmount = price - (downpayment || 0);
+                const monthlyInterestRate = (4 / 100) / 12;
+                const numberOfPayments = years * 12;
+                
+                if (numberOfPayments > 0 && monthlyInterestRate > 0) {
+                    const monthlyPayment = (loanAmount * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -numberOfPayments));
+                    document.getElementById('result').innerText = 'القسط الشهري التقديري: ' + Math.max(0, monthlyPayment).toFixed(0) + ' ر.ق';
+                } else {
+                    document.getElementById('result').innerText = 'القسط الشهري التقديري: 0 ر.ق';
+                }
+            } else {
+                document.getElementById('result').innerText = 'القسط الشهري التقديري: 0 ر.ق';
+            }
+        }
+
+        function calculateRent() {
+            const monthlyRent = parseFloat(document.getElementById('monthly-rent').value);
+            if (monthlyRent > 0) {
+                const annualRent = monthlyRent * 12;
+                document.getElementById('rent-result').innerText = 'إجمالي الإيجار السنوي (12 شهر): ' + annualRent.toFixed(0) + ' ر.ق';
+            } else {
+                document.getElementById('rent-result').innerText = 'إجمالي الإيجار السنوي (12 شهر): 0 ر.ق';
+            }
+        }
+
+        let favorites = [];
+
+        function updateFavoritesView() {
+            const container = document.getElementById('fav-container');
+            if (favorites.length === 0) {
+                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لم تقم بإضافة أي عقارات للمفضلة حتى الآن.</div>';
+            } else {
+                container.innerHTML = favorites.map(fav => `
+                    <div class="ad-card">
+                        <div class="ad-img">
+                            صورة العقار
+                            <button class="fav-btn" style="color: var(--gold);" onclick="removeFavorite('${fav.id}')">♥</button>
+                        </div>
+                        <div class="ad-content">
+                            <div class="ad-title">${fav.title}</div>
+                            <div class="ad-details">${fav.details}</div>
+                            <div class="ad-footer">
+                                <span>${fav.priceText}</span>
+                                <span class="views-badge">${fav.views}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function removeFavorite(id) {
+            favorites = favorites.filter(fav => fav.id !== id);
+            updateFavoritesView();
+            alert('تمت الإزالة من المفضلة');
+        }
+
+        updateFavoritesView();
+
+        function applyFilters() {
+            const selectedType = document.getElementById('filter-type').value;
+            const selectedCity = document.getElementById('filter-city').value;
+            const maxPrice = parseFloat(document.getElementById('filter-max-price').value) || Infinity;
+
+            const cards = document.querySelectorAll('#main-ads-grid .ad-card');
+            cards.forEach(card => {
+                const type = card.getAttribute('data-type');
+                const city = card.getAttribute('data-city');
+                const price = parseFloat(card.getAttribute('data-price'));
+
+                let matchType = !selectedType || type === selectedType;
+                let matchCity = !selectedCity || city === selectedCity;
+                let matchPrice = price <= maxPrice;
+
+                if (matchType && matchCity && matchPrice) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        async function fetchNews() {
+            const apiKey = 'pub_0d694ce2a4d14bbba74ebffebefe8e6';
+            const url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=عقارات قطر OR أسعار العقارات في قطر&language=ar`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const newsGrid = document.getElementById('news-grid');
+                
+                if (data.results && data.results.length > 0) {
+                    const fourteenDaysAgo = new Date();
+                    fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+
+                    const filteredArticles = data.results.filter(article => {
+                        if (!article.pubDate) return false;
+                        const articleDate = new Date(article.pubDate);
+                        return articleDate >= fourteenDaysAgo;
+                    });
+
+                    if (filteredArticles.length > 0) {
+                        newsGrid.innerHTML = '';
+                        filteredArticles.forEach(article => {
+                            const newsItem = document.createElement('div');
+                            newsItem.className = 'news-item';
+                            newsItem.innerHTML = `
+                                <a href="${article.link}" target="_blank" class="news-title">${article.title}</a>
+                                <div class="news-desc">${article.description || 'لا توجد تفاصيل متاحة.'}</div>
+                                <div class="news-date">تاريخ النشر: ${article.pubDate}</div>
+                            `;
+                            newsGrid.appendChild(newsItem);
+                        });
+                    } else {
+                        newsGrid.innerHTML = 'لا توجد أخبار عقارية في قطر خلال الـ 14 يوماً الماضية.';
+                    }
+                } else {
+                    newsGrid.innerHTML = 'لا توجد أخبار متاحة حالياً.';
+                }
+            } catch (error) {
+                console.error('Error fetching news:', error);
+                document.getElementById('news-grid').innerHTML = 'حدث خطأ أثناء تحميل الأخبار.';
+            }
+        }
+
+        fetchNews();
+        setInterval(fetchNews, 300000);
+    </script>
+</body>
+</html>
