@@ -436,8 +436,7 @@
             <div class="filter-section">
                 <div class="filter-grid">
                     <div>
-                        <label for="filter-type" style="display:none">نوع العقار</label>
-                        <select id="filter-type">
+                        <select id="filter-type" aria-label="نوع العقار">
                             <option value="">نوع العقار (الكل)</option>
                             <option value="villa">فيلا</option>
                             <option value="apartment">شقة</option>
@@ -447,8 +446,7 @@
                         </select>
                     </div>
                     <div>
-                        <label for="filter-city" style="display:none">المنطقة</label>
-                        <select id="filter-city">
+                        <select id="filter-city" aria-label="المنطقة">
                             <option value="">المنطقة/البلدية (الكل)</option>
                             <option value="الدوحة">الدوحة</option>
                             <option value="الريان">الريان</option>
@@ -471,8 +469,7 @@
                         </select>
                     </div>
                     <div>
-                        <label for="filter-max-price" style="display:none">السعر الأقصى</label>
-                        <input type="number" id="filter-max-price" placeholder="الحد الأقصى للسعر (ر.ق)">
+                        <input type="number" id="filter-max-price" placeholder="الحد الأقصى للسعر (ر.ق)" aria-label="الحد الأقصى للسعر">
                     </div>
                     <button class="btn-gold" onclick="applyFilters()">بحث وتصفية</button>
                 </div>
@@ -480,7 +477,7 @@
 
             <div class="section-title">الإعلانات العقارية المتوفرة</div>
             <div class="ads-grid" id="main-ads-grid">
-                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">جاري تحميل الإعلانات من قاعدة البيانات...</div>
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">جاري تحميل الإعلانات...</div>
             </div>
 
             <div class="section-title">حاسبة التمويل العقاري</div>
@@ -550,8 +547,7 @@
             <div style="max-width: 400px; margin: 0 auto;">
                 <div class="auth-box">
                     <form onsubmit="loginUser(event)">
-                        <label for="login-phone" style="display:none">رقم الجوال</label>
-                        <input type="tel" id="login-phone" placeholder="رقم الجوال (مثال: +974...)" required>
+                        <input type="tel" id="login-phone" placeholder="رقم الجوال (مثال: +974...)" aria-label="رقم الجوال" required>
                         <button type="submit" class="btn-gold" style="width: 100%; margin-top: 15px;">تسجيل الدخول</button>
                     </form>
                     <p style="text-align: center; margin-top: 20px; color: var(--text-muted);">
@@ -573,10 +569,8 @@
                         </div>
                         <input type="file" id="register-pic-input" accept="image/*" style="display: none;" onchange="loadRegisterPic(event)">
 
-                        <label for="reg-name" style="display:none">الاسم الكامل</label>
-                        <input type="text" id="reg-name" placeholder="الاسم الكامل" required>
-                        <label for="reg-phone" style="display:none">رقم الجوال</label>
-                        <input type="tel" id="reg-phone" placeholder="رقم الجوال (مثال: +974...)" required>
+                        <input type="text" id="reg-name" placeholder="الاسم الكامل" aria-label="الاسم الكامل" required>
+                        <input type="tel" id="reg-phone" placeholder="رقم الجوال (مثال: +974...)" aria-label="رقم الجوال" required>
                         <button type="submit" class="btn-gold" style="width: 100%; margin-top: 15px;">إنشاء حساب</button>
                     </form>
                     <p style="text-align: center; margin-top: 20px; color: var(--text-muted);">
@@ -622,21 +616,17 @@
             <div class="section-title">إضافة إعلان جديد</div>
             <div class="ad-form" style="max-width: 800px; margin: 0 auto;">
                 <form id="adForm" onsubmit="addNewAd(event)">
-                    <label for="ad-title-input" style="display:none">عنوان الإعلان</label>
-                    <input type="text" id="ad-title-input" placeholder="عنوان الإعلان" required>
+                    <input type="text" id="ad-title-input" placeholder="عنوان الإعلان" aria-label="عنوان الإعلان" required>
                     
-                    <label for="ad-desc-input" style="display:none">وصف العقار</label>
-                    <textarea id="ad-desc-input" placeholder="وصف العقار" rows="4" required></textarea>
+                    <textarea id="ad-desc-input" placeholder="وصف العقار" rows="4" aria-label="وصف العقار" required></textarea>
                     
-                    <label for="ad-purpose-input" style="display:none">غرض الإعلان</label>
-                    <select id="ad-purpose-input" required>
+                    <select id="ad-purpose-input" aria-label="غرض الإعلان" required>
                         <option value="" disabled selected>غرض الإعلان</option>
                         <option value="sale">للبيع</option>
                         <option value="rent">للإيجار</option>
                     </select>
 
-                    <label for="ad-type-input" style="display:none">نوع العقار</label>
-                    <select id="ad-type-input" required>
+                    <select id="ad-type-input" aria-label="نوع العقار" required>
                         <option value="" disabled selected>نوع العقار</option>
                         <option value="villa">فيلا</option>
                         <option value="apartment">شقة</option>
@@ -645,11 +635,9 @@
                         <option value="commercial">تجاري</option>
                     </select>
 
-                    <label for="ad-price-input" style="display:none">السعر</label>
-                    <input type="number" id="ad-price-input" placeholder="السعر (ر.ق)" required>
+                    <input type="number" id="ad-price-input" placeholder="السعر (ر.ق)" aria-label="السعر" required>
                     
-                    <label for="ad-city-input" style="display:none">المنطقة</label>
-                    <select id="ad-city-input" required>
+                    <select id="ad-city-input" aria-label="اختر المنطقة أو البلدية" required>
                         <option value="" disabled selected>اختر المنطقة أو البلدية</option>
                         <option value="الدوحة">الدوحة</option>
                         <option value="الريان">الريان</option>
@@ -683,10 +671,10 @@
                     </div>
                     
                     <div style="color: var(--text-color); margin-top: 15px; font-weight: bold;">رفع الصور (بحد أقصى 10 صور):</div>
-                    <input type="file" id="ad-images-input" accept="image/*" multiple>
+                    <input type="file" id="ad-images-input" accept="image/*" multiple aria-label="رفع الصور">
                     
                     <div style="color: var(--text-color); margin-top: 15px; font-weight: bold;">رفع الفيديوهات (بحد أقصى 3 فيديوهات):</div>
-                    <input type="file" id="ad-videos-input" accept="video/*" multiple>
+                    <input type="file" id="ad-videos-input" accept="video/*" multiple aria-label="رفع الفيديوهات">
                     
                     <button type="submit" class="btn-gold" style="width: 100%; margin-top: 20px;">نشر الإعلان</button>
                 </form>
@@ -744,9 +732,8 @@
 
         let map, marker, fullMap, fullMarker;
         let allAds = [];
-        let newsList = JSON.parse(localStorage.getItem('almawathiq_news')) || [
-            { id: '1', title: 'افتتاح مشروع سكني جديد في لوسيل', description: 'أعلنت إحدى الشركات العقارية عن اطلاق مجمع سكني فاخر يضم فلل وشقق راقية.', date: '2026-08-25' }
-        ];
+        
+        let newsList = JSON.parse(localStorage.getItem('almawathiq_news')) || [];
         let favorites = JSON.parse(localStorage.getItem('almawathiq_favs')) || [];
         let isLoggedIn = false;
         let currentUser = { name: '', phone: '' };
@@ -1155,11 +1142,10 @@
             }
         }
 
-        // نظام إدارة ونشر الأخبار بنفسك
         function renderNews() {
             const newsGrid = document.getElementById('news-grid');
             if (newsList.length === 0) {
-                newsGrid.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">لا توجد أخبار مضافة حالياً.</div>';
+                newsGrid.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">لا توجد أخبار مضافة حالياً. اضغط على زر "إضافة خبر جديد" لإدراج أخبارك.</div>';
                 return;
             }
 
