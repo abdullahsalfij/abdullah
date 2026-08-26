@@ -29,7 +29,6 @@
             box-sizing: inherit;
         }
 
-        /* --- الهيدر المتجاوب --- */
         header {
             background: linear-gradient(135deg, #000000, #1a1a1a);
             border-bottom: 2px solid var(--gold);
@@ -54,7 +53,6 @@
             border-radius: 6px;
             border: 1px solid var(--gold-dark);
             background: #000;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
         }
 
         .logo-text-group {
@@ -66,14 +64,12 @@
             font-size: 18px;
             font-weight: bold;
             color: var(--gold);
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
             line-height: 1.2;
         }
 
         .logo-sub {
             font-size: 10px;
             color: var(--text-muted);
-            letter-spacing: 0.5px;
         }
 
         nav {
@@ -108,14 +104,12 @@
             font-weight: bold;
             border-radius: 5px;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
             transition: 0.3s;
             font-size: 13px;
         }
 
         .btn-gold:hover {
             background: var(--gold-light);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.7);
         }
 
         .btn-outline {
@@ -199,7 +193,6 @@
 
         .ad-card:hover {
             border-color: var(--gold);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
         }
 
         .ad-img {
@@ -230,17 +223,11 @@
             padding: 4px 8px;
             border-radius: 50%;
             cursor: pointer;
-            transition: 0.3s;
             z-index: 10;
         }
 
         .fav-btn { left: 10px; }
         .share-btn { right: 10px; }
-
-        .fav-btn:hover, .share-btn:hover {
-            background: var(--gold);
-            color: #000;
-        }
 
         .ad-content {
             padding: 15px;
@@ -276,13 +263,8 @@
             border-radius: 4px;
         }
 
-        .page-view {
-            display: none;
-        }
-
-        .page-view.active {
-            display: block;
-        }
+        .page-view { display: none; }
+        .page-view.active { display: block; }
 
         .auth-box input, .ad-form input, .ad-form textarea, .ad-form select, .profile-box input {
             display: block;
@@ -369,12 +351,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
-            transition: 0.3s;
             margin-top: 8px;
-        }
-
-        .btn-delete-ad:hover {
-            background-color: #c9302c;
         }
 
         .ad-full-page {
@@ -419,38 +396,10 @@
             text-decoration: none;
             font-size: 14px;
             margin-bottom: 8px;
-            transition: 0.3s;
         }
 
         .contact-section a:hover {
             color: var(--gold);
-        }
-
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                padding: 10px;
-            }
-            .logo-container {
-                position: static;
-                justify-content: center;
-            }
-            nav {
-                justify-content: center;
-                gap: 10px;
-                width: 100%;
-                font-size: 13px;
-            }
-            .header-actions {
-                justify-content: center;
-                width: 100%;
-            }
-            .container {
-                margin: 15px auto;
-                padding: 0 10px;
-            }
         }
     </style>
 </head>
@@ -488,36 +437,45 @@
             <div class="section-title">البحث المتقدم</div>
             <div class="filter-section">
                 <div class="filter-grid">
-                    <select id="filter-type">
-                        <option value="">نوع العقار (الكل)</option>
-                        <option value="villa">فيلا</option>
-                        <option value="apartment">شقة</option>
-                        <option value="land">أرض</option>
-                        <option value="chalet">شاليه</option>
-                        <option value="commercial">تجاري</option>
-                    </select>
-                    <select id="filter-city">
-                        <option value="">المنطقة/البلدية (الكل)</option>
-                        <option value="الدوحة">الدوحة</option>
-                        <option value="الريان">الريان</option>
-                        <option value="الوكرة">الوكرة</option>
-                        <option value="الخور">الخور والذكيرة</option>
-                        <option value="الضعاين">الضعاين</option>
-                        <option value="الشمال">الشمال</option>
-                        <option value="الشيحانية">الشيحانية</option>
-                        <option value="أم صلال">أم صلال</option>
-                        <option value="مسيعيد">مسيعيد</option>
-                        <option value="دخان">دخان</option>
-                        <option value="لوسيل">لوسيل</option>
-                        <option value="اللؤلؤة">اللؤلؤة</option>
-                        <option value="القصار">القصار</option>
-                        <option value="الوعب">الوعب</option>
-                        <option value="المرخية">المرخية</option>
-                        <option value="عين خالد">عين خالد</option>
-                        <option value="معيذر">معيذر</option>
-                        <option value="أبو هامور">أبو هامور</option>
-                    </select>
-                    <input type="number" id="filter-max-price" placeholder="الحد الأقصى للسعر (ر.ق)">
+                    <div>
+                        <label for="filter-type" style="display:none">نوع العقار</label>
+                        <select id="filter-type">
+                            <option value="">نوع العقار (الكل)</option>
+                            <option value="villa">فيلا</option>
+                            <option value="apartment">شقة</option>
+                            <option value="land">أرض</option>
+                            <option value="chalet">شاليه</option>
+                            <option value="commercial">تجاري</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-city" style="display:none">المنطقة</label>
+                        <select id="filter-city">
+                            <option value="">المنطقة/البلدية (الكل)</option>
+                            <option value="الدوحة">الدوحة</option>
+                            <option value="الريان">الريان</option>
+                            <option value="الوكرة">الوكرة</option>
+                            <option value="الخور">الخور والذكيرة</option>
+                            <option value="الضعاين">الضعاين</option>
+                            <option value="الشمال">الشمال</option>
+                            <option value="الشيحانية">الشيحانية</option>
+                            <option value="أم صلال">أم صلال</option>
+                            <option value="مسيعيد">مسيعيد</option>
+                            <option value="دخان">دخان</option>
+                            <option value="لوسيل">لوسيل</option>
+                            <option value="اللؤلؤة">اللؤلؤة</option>
+                            <option value="القصار">القصار</option>
+                            <option value="الوعب">الوعب</option>
+                            <option value="المرخية">المرخية</option>
+                            <option value="عين خالد">عين خالد</option>
+                            <option value="معيذر">معيذر</option>
+                            <option value="أبو هامور">أبو هامور</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-max-price" style="display:none">السعر الأقصى</label>
+                        <input type="number" id="filter-max-price" placeholder="الحد الأقصى للسعر (ر.ق)">
+                    </div>
                     <button class="btn-gold" onclick="applyFilters()">بحث وتصفية</button>
                 </div>
             </div>
@@ -531,16 +489,16 @@
             <div class="calc-section">
                 <div class="calc-form">
                     <div>
-                        <label>سعر العقار (ر.ق):</label>
-                        <input type="number" id="price" placeholder="أدخل سعر العقار" oninput="calculate()">
+                        <label for="calc-price">سعر العقار (ر.ق):</label>
+                        <input type="number" id="calc-price" placeholder="أدخل سعر العقار" oninput="calculate()">
                     </div>
                     <div>
-                        <label>الدفعة الأولى (ر.ق):</label>
-                        <input type="number" id="downpayment" placeholder="أدخل الدفعة الأولى" oninput="calculate()">
+                        <label for="calc-downpayment">الدفعة الأولى (ر.ق):</label>
+                        <input type="number" id="calc-downpayment" placeholder="أدخل الدفعة الأولى" oninput="calculate()">
                     </div>
                     <div>
-                        <label>مدة القرض (سنوات):</label>
-                        <input type="number" id="years" placeholder="أدخل مدة القرض" oninput="calculate()">
+                        <label for="calc-years">مدة القرض (سنوات):</label>
+                        <input type="number" id="calc-years" placeholder="أدخل مدة القرض" oninput="calculate()">
                     </div>
                 </div>
                 <div class="calc-result" id="result">القسط الشهري التقديري: 0 ر.ق</div>
@@ -550,8 +508,8 @@
             <div class="calc-section">
                 <div class="calc-form">
                     <div>
-                        <label>الإيجار الشهري (ر.ق):</label>
-                        <input type="number" id="monthly-rent" placeholder="أدخل الإيجار الشهري" oninput="calculateRent()">
+                        <label for="calc-monthly-rent">الإيجار الشهري (ر.ق):</label>
+                        <input type="number" id="calc-monthly-rent" placeholder="أدخل الإيجار الشهري" oninput="calculateRent()">
                     </div>
                 </div>
                 <div class="calc-result" id="rent-result">إجمالي الإيجار السنوي (12 شهر): 0 ر.ق</div>
@@ -559,12 +517,8 @@
 
             <div class="section-title">تواصل معنا</div>
             <div class="about-section contact-section">
-                <a href="https://wa.me/97433293328" target="_blank">
-                    📱 تواصل معنا عبر الواتساب: 97433293328+
-                </a>
-                <a href="https://www.instagram.com/abds_31" target="_blank">
-                    📷 تابعنا على الإنستقرام: abds_31
-                </a>
+                <a href="https://wa.me/97433293328" target="_blank">📱 تواصل معنا عبر الواتساب: 97433293328+</a>
+                <a href="https://www.instagram.com/abds_31" target="_blank">📷 تابعنا على الإنستقرام: abds_31</a>
             </div>
         </div>
 
@@ -592,12 +546,13 @@
             </div>
         </div>
 
-        <!-- صفحة تسجيل الدخول برقم الجوال -->
+        <!-- صفحة تسجيل الدخول -->
         <div id="auth" class="page-view">
             <div class="section-title">تسجيل الدخول برقم الجوال</div>
             <div style="max-width: 400px; margin: 0 auto;">
                 <div class="auth-box">
                     <form onsubmit="loginUser(event)">
+                        <label for="login-phone" style="display:none">رقم الجوال</label>
                         <input type="tel" id="login-phone" placeholder="رقم الجوال (مثال: +974...)" required>
                         <button type="submit" class="btn-gold" style="width: 100%; margin-top: 15px;">تسجيل الدخول</button>
                     </form>
@@ -620,7 +575,9 @@
                         </div>
                         <input type="file" id="register-pic-input" accept="image/*" style="display: none;" onchange="loadRegisterPic(event)">
 
+                        <label for="reg-name" style="display:none">الاسم الكامل</label>
                         <input type="text" id="reg-name" placeholder="الاسم الكامل" required>
+                        <label for="reg-phone" style="display:none">رقم الجوال</label>
                         <input type="tel" id="reg-phone" placeholder="رقم الجوال (مثال: +974...)" required>
                         <button type="submit" class="btn-gold" style="width: 100%; margin-top: 15px;">إنشاء حساب</button>
                     </form>
@@ -653,7 +610,7 @@
             </div>
         </div>
 
-        <!-- صفحة الأخبار العقارية -->
+        <!-- صفحة الأخبار -->
         <div id="news" class="page-view">
             <div class="section-title">أخبار العقارات في قطر (آخر 14 يوماً)</div>
             <div id="news-grid">جاري تحميل الأخبار...</div>
@@ -664,15 +621,20 @@
             <div class="section-title">إضافة إعلان جديد</div>
             <div class="ad-form" style="max-width: 800px; margin: 0 auto;">
                 <form id="adForm" onsubmit="addNewAd(event)">
+                    <label for="ad-title-input" style="display:none">عنوان الإعلان</label>
                     <input type="text" id="ad-title-input" placeholder="عنوان الإعلان" required>
+                    
+                    <label for="ad-desc-input" style="display:none">وصف العقار</label>
                     <textarea id="ad-desc-input" placeholder="وصف العقار" rows="4" required></textarea>
                     
+                    <label for="ad-purpose-input" style="display:none">غرض الإعلان</label>
                     <select id="ad-purpose-input" required>
                         <option value="" disabled selected>غرض الإعلان</option>
                         <option value="sale">للبيع</option>
                         <option value="rent">للإيجار</option>
                     </select>
 
+                    <label for="ad-type-input" style="display:none">نوع العقار</label>
                     <select id="ad-type-input" required>
                         <option value="" disabled selected>نوع العقار</option>
                         <option value="villa">فيلا</option>
@@ -682,8 +644,10 @@
                         <option value="commercial">تجاري</option>
                     </select>
 
+                    <label for="ad-price-input" style="display:none">السعر</label>
                     <input type="number" id="ad-price-input" placeholder="السعر (ر.ق)" required>
                     
+                    <label for="ad-city-input" style="display:none">المنطقة</label>
                     <select id="ad-city-input" required>
                         <option value="" disabled selected>اختر المنطقة أو البلدية</option>
                         <option value="الدوحة">الدوحة</option>
@@ -756,10 +720,8 @@
         <p>جميع الحقوق محفوظة ©️ المواثيق العقارية</p>
     </footer>
 
-    <!-- مكتبة الخرائط Leaflet -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- سكربتات Firebase وربط قاعدة البيانات Firestore المحدثة -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -890,7 +852,6 @@
             }
         }
 
-        // جلب الإعلانات من مجموعة "abdullah" في Firestore
         async function loadAdsFromFirebase() {
             try {
                 const querySnapshot = await getDocs(collection(db, "abdullah"));
@@ -905,7 +866,6 @@
             }
         }
 
-        // إضافة إعلان جديد إلى مجموعة "abdullah" في Firestore
         window.addNewAd = async function(event) {
             event.preventDefault();
 
@@ -1097,7 +1057,6 @@
             const ad = allAds.find(a => a.id === adId);
             if (!ad) return;
             
-            // تحديث المشاهدات في مجموعة "abdullah" في قاعدة البيانات
             try {
                 const adRef = doc(db, "abdullah", adId);
                 await updateDoc(adRef, {
@@ -1167,9 +1126,9 @@
         }
 
         window.calculate = function() {
-            const price = parseFloat(document.getElementById('price').value);
-            const downpayment = parseFloat(document.getElementById('downpayment').value);
-            const years = parseFloat(document.getElementById('years').value);
+            const price = parseFloat(document.getElementById('calc-price').value);
+            const downpayment = parseFloat(document.getElementById('calc-downpayment').value);
+            const years = parseFloat(document.getElementById('calc-years').value);
             if (price > 0 && years > 0) {
                 const loanAmount = price - (downpayment || 0);
                 const monthlyInterestRate = (4 / 100) / 12;
@@ -1182,7 +1141,7 @@
         }
 
         window.calculateRent = function() {
-            const monthlyRent = parseFloat(document.getElementById('monthly-rent').value);
+            const monthlyRent = parseFloat(document.getElementById('calc-monthly-rent').value);
             if (monthlyRent > 0) {
                 document.getElementById('rent-result').innerText = 'إجمالي الإيجار السنوي (12 شهر): ' + (monthlyRent * 12).toFixed(0) + ' ر.ق';
             } else {
