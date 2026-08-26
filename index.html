@@ -748,9 +748,24 @@
             </div>
         </div>
     </div>
-    let map, marker, fullMap;
+
+    <footer>
+        <div style="font-size: 16px; color: var(--gold); margin-bottom: 10px; font-weight: bold;">المواثيق العقارية - دولة قطر</div>
+        <p>جميع حقوق الطبع والنشر محفوظة © 2026</p>
+        <div class="social-links" style="margin-top: 15px;">
+            <a href="#" target="_blank">🌐 الموقع الرسمي</a>
+            <a href="#" target="_blank">📱 إكس (تويتر)</a>
+            <a href="#" target="_blank">📸 إنستغرام</a>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let map, marker, fullMap;
         let allAds = [];
         let favorites = [];
+        let isLoggedIn = false;
+        let currentUser = { name: "", phone: "" };
 
         function initMap() {
             map = L.map('map').setView([25.2854, 51.5310], 11);
@@ -924,7 +939,7 @@
 
                 const cardHtml = `
                     <div class="ad-card" data-type="${ad.type}" data-city="${ad.city}" data-price="${ad.price}" onclick="viewAdDetails('${ad.id}')">
-                        <button class="fav-btn" style="color: ${isFav ? 'var(--gold)' : 'inherit'};" onclick="toggleFavorite('${ad.id}', event)">♥</button>
+                        <button class="fav-btn" style="color: ${isFav ? 'var(--gold)' : 'inherit'};" onclick="toggleFavorite('${ad.id}', event)">♥️</button>
                         <div class="ad-img">${mediaHtml}</div>
                         <div class="ad-content">
                             <div class="ad-title">${ad.title}</div>
@@ -979,7 +994,7 @@
             container.innerHTML = favorites.length === 0 ? '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لم تقم بإضافة عقارات للمفضلة.</div>' :
                 favorites.map(ad => `
                     <div class="ad-card" onclick="viewAdDetails('${ad.id}')">
-                        <button class="fav-btn" style="color: var(--gold);" onclick="toggleFavorite('${ad.id}', event)">♥</button>
+                        <button class="fav-btn" style="color: var(--gold);" onclick="toggleFavorite('${ad.id}', event)">♥️</button>
                         <div class="ad-img"><img src="${ad.images[0]}" alt="${ad.title}"></div>
                         <div class="ad-content">
                             <div class="ad-title">${ad.title}</div>
@@ -1087,7 +1102,7 @@
                 } else {
                     newsGrid.innerHTML = 'لا توجد أخبار.';
                 }
-            } catch (error) {
+            } (error) {
                 document.getElementById('news-grid').innerHTML = 'حدث خطأ.';
             }
         }
