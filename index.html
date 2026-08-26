@@ -142,32 +142,13 @@
             font-size: 22px;
         }
 
-        .about-section, .stats-section, .calc-section, .filter-section, .auth-box, .ad-form, .profile-box, .ad-full-page {
+        .about-section, .calc-section, .filter-section, .auth-box, .ad-form, .profile-box, .ad-full-page {
             background-color: var(--card-bg);
             border: 1px solid var(--gold-dark);
             padding: 30px;
             border-radius: 8px;
             margin-bottom: 40px;
             line-height: 1.6;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 15px;
-            border: 1px solid #333;
-            border-radius: 8px;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            color: var(--gold);
-            font-weight: bold;
         }
 
         .filter-grid, .calc-form {
@@ -436,6 +417,21 @@
             color: var(--gold-light);
             text-shadow: 0 0 5px var(--gold);
         }
+
+        .contact-section a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 16px;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+
+        .contact-section a:hover {
+            color: var(--gold);
+        }
     </style>
 </head>
 <body>
@@ -511,28 +507,6 @@
                 <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات منشورة حالياً. أضف إعلانك الأول!</div>
             </div>
 
-            <div class="section-title">متوسط أسعار العقارات في قطر</div>
-            <div class="stats-section">
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-value">12,000 ر.ق</div>
-                        <div>متوسط سعر المتر (الدوحة)</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">9,000 ر.ق</div>
-                        <div>متوسط سعر المتر (الوكرة)</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">8,000 ر.ق</div>
-                        <div>متوسط سعر المتر (الريان)</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">10,000 ر.ق</div>
-                        <div>متوسط سعر المتر (الخور)</div>
-                    </div>
-                </div>
-            </div>
-
             <div class="section-title">حاسبة التمويل العقاري</div>
             <div class="calc-section">
                 <div class="calc-form">
@@ -561,6 +535,16 @@
                     </div>
                 </div>
                 <div class="calc-result" id="rent-result">إجمالي الإيجار السنوي (12 شهر): 0 ر.ق</div>
+            </div>
+
+            <div class="section-title">تواصل معنا</div>
+            <div class="about-section contact-section">
+                <a href="https://wa.me/97433293328" target="_blank">
+                    📱 تواصل معنا عبر الواتساب: 97433293328+
+                </a>
+                <a href="https://www.instagram.com/abds_31" target="_blank">
+                    📷 تابعنا على الإنستقرام: abds_31
+                </a>
             </div>
         </div>
 
