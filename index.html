@@ -1,1269 +1,404 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المواثيق العقارية</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        :root {
-            --bg-color: #0b0b0b;
-            --card-bg: #141414;
-            --gold: #d4af37;
-            --gold-light: #f3e5ab;
-            --gold-dark: #aa8c2c;
-            --text-color: #ffffff;
-            --text-muted: #aaaaaa;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        *, *:before, *:after {
-            box-sizing: inherit;
-        }
-
-        header {
-            background: linear-gradient(135deg, #000000, #1a1a1a);
-            border-bottom: 2px solid var(--gold);
-            padding: 15px 20px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-img {
-            width: 55px;
-            height: 55px;
-            object-fit: contain;
-            border-radius: 6px;
-            border: 1px solid var(--gold-dark);
-            background: #000;
-        }
-
-        .logo-text-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo {
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--gold);
-            line-height: 1.2;
-        }
-
-        .logo-sub {
-            font-size: 10px;
-            color: var(--text-muted);
-        }
-
-        nav {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        nav a {
-            color: var(--text-color);
-            text-decoration: none;
-            transition: 0.3s;
-            font-size: 14px;
-        }
-
-        nav a:hover {
-            color: var(--gold);
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .btn-gold {
-            background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-            color: #000;
-            border: none;
-            padding: 8px 14px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 13px;
-        }
-
-        .btn-gold:hover {
-            background: var(--gold-light);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--gold);
-            border: 1px solid var(--gold);
-            padding: 8px 14px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 13px;
-        }
-
-        .btn-outline:hover {
-            background: rgba(212, 175, 55, 0.1);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 0 15px;
-        }
-
-        .section-title {
-            color: var(--gold);
-            border-bottom: 1px solid var(--gold);
-            padding-bottom: 8px;
-            margin: 30px 0 15px 0;
-            font-size: 20px;
-        }
-
-        .about-section, .calc-section, .filter-section, .auth-box, .ad-form, .profile-box, .ad-full-page {
-            background-color: var(--card-bg);
-            border: 1px solid var(--gold-dark);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .filter-grid, .calc-form {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
-        }
-
-        .filter-grid select, .filter-grid input, .calc-form input {
-            width: 100%;
-            padding: 10px;
-            background-color: #222;
-            border: 1px solid #444;
-            color: var(--text-color);
-            border-radius: 5px;
-        }
-
-        .calc-result {
-            margin-top: 15px;
-            text-align: center;
-            font-size: 16px;
-            color: var(--gold);
-            font-weight: bold;
-        }
-
-        .ads-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .ad-card {
-            background-color: var(--card-bg);
-            border: 1px solid #333;
-            border-radius: 8px;
-            overflow: hidden;
-            transition: 0.3s;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .ad-card:hover {
-            border-color: var(--gold);
-        }
-
-        .ad-img {
-            width: 100%;
-            height: 170px;
-            background-color: #222;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .ad-img img, .ad-img video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .fav-btn, .share-btn {
-            position: absolute;
-            top: 10px;
-            background: rgba(0, 0, 0, 0.6);
-            border: none;
-            color: var(--text-color);
-            font-size: 16px;
-            padding: 4px 8px;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 10;
-        }
-
-        .fav-btn { left: 10px; }
-        .share-btn { right: 10px; }
-
-        .ad-content {
-            padding: 15px;
-        }
-
-        .ad-title {
-            color: var(--gold);
-            font-size: 16px;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-
-        .ad-details {
-            color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 12px;
-        }
-
-        .ad-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid #222;
-            padding-top: 8px;
-            font-size: 12px;
-            color: var(--gold-light);
-        }
-
-        .views-badge {
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid var(--gold-dark);
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        .page-view { display: none; }
-        .page-view.active { display: block; }
-
-        .auth-box input, .ad-form input, .ad-form textarea, .ad-form select, .profile-box input {
-            display: block;
-            margin: 12px auto;
-            width: 100%;
-            padding: 10px;
-            background-color: #222;
-            border: 1px solid #444;
-            color: var(--text-color);
-            border-radius: 5px;
-        }
-
-        #map, #full-ad-map {
-            height: 250px;
-            width: 100%;
-            border: 1px solid #444;
-            border-radius: 5px;
-            margin: 10px 0;
-            z-index: 1;
-        }
-
-        .coordinates-info {
-            font-size: 12px;
-            color: var(--gold-light);
-            margin-bottom: 10px;
-        }
-
-        .profile-img-upload {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background-color: #222;
-            border: 2px dashed var(--gold);
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--gold);
-            cursor: pointer;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .profile-img-upload img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-
-        .news-item {
-            background: #111;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 6px;
-            border-right: 3px solid var(--gold);
-        }
-
-        .news-title {
-            font-size: 17px;
-            font-weight: bold;
-            color: var(--gold);
-            margin-bottom: 8px;
-        }
-
-        .news-desc {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-
-        .news-date {
-            font-size: 11px;
-            color: #888;
-        }
-
-        .btn-delete-ad {
-            background-color: #a94442;
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-top: 8px;
-        }
-
-        .btn-edit-ad {
-            background-color: var(--gold-dark);
-            color: #000;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-top: 8px;
-            font-weight: bold;
-            margin-left: 5px;
-        }
-
-        .ad-full-page {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .media-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .media-item {
-            height: 200px;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid #444;
-        }
-
-        .media-item img, .media-item video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            background-color: #050505;
-            color: var(--text-muted);
-            border-top: 1px solid #222;
-            font-size: 13px;
-        }
-
-        .contact-section a {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-color);
-            text-decoration: none;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-
-        .contact-section a:hover {
-            color: var(--gold);
-        }
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="logo-container">
-            <img src="" alt="شعار المواثيق العقارية" class="logo-img" id="brand-logo">
-            <div class="logo-text-group">
-                <div class="logo">المواثيق العقارية</div>
-                <div class="logo-sub">ALMAWATHIQ REAL ESTATE</div>
-            </div>
-        </div>
-        <nav>
-            <a href="#" onclick="switchPage('home')">الرئيسية</a>
-            <a href="#" onclick="switchPage('rent')">بيوت الإيجار</a>
-            <a href="#" onclick="switchPage('sale')">بيوت للبيع</a>
-            <a href="#" onclick="switchPage('news')">الأخبار العقارية</a>
-            <a href="#" onclick="switchPage('favorites')">المفضلة</a>
-        </nav>
-        <div class="header-actions">
-            <button id="account-btn" class="btn-outline" onclick="handleAccountClick()">تسجيل الدخول</button>
-            <button class="btn-gold" onclick="prepareAddAd()">إضافة إعلان</button>
-        </div>
-    </header>
-
-    <div class="container">
-        <!-- صفحة الرئيسية -->
-        <div id="home" class="page-view active">
-            <div class="about-section">
-                <h2 style="color: var(--gold); margin-top: 0;">عن الشركة</h2>
-                <p>مرحباً بك في المواثيق العقارية. نحن نبتكر أفضل الحلول العقارية ونوفر منصة متكاملة لعرض وطلب العقارات بأعلى معايير الجودة والفخامة في دولة قطر.</p>
-            </div>
-
-            <div class="section-title">البحث المتقدم</div>
-            <div class="filter-section">
-                <div class="filter-grid">
-                    <div>
-                        <select id="filter-type" aria-label="نوع العقار">
-                            <option value="">نوع العقار (الكل)</option>
-                            <option value="villa">فيلا</option>
-                            <option value="apartment">شقة</option>
-                            <option value="land">أرض</option>
-                            <option value="chalet">شاليه</option>
-                            <option value="commercial">تجاري</option>
-                        </select>
-                    </div>
-                    <div>
-                        <select id="filter-city" aria-label="المنطقة">
-                            <option value="">المنطقة/البلدية (الكل)</option>
-                            <option value="الدوحة">الدوحة</option>
-                            <option value="الريان">الريان</option>
-                            <option value="الوكرة">الوكرة</option>
-                            <option value="الخور">الخور والذكيرة</option>
-                            <option value="الضعاين">الضعاين</option>
-                            <option value="الشمال">الشمال</option>
-                            <option value="الشيحانية">الشيحانية</option>
-                            <option value="أم صلال">أم صلال</option>
-                            <option value="مسيعيد">مسيعيد</option>
-                            <option value="دخان">دخان</option>
-                            <option value="لوسيل">لوسيل</option>
-                            <option value="اللؤلؤة">اللؤلؤة</option>
-                            <option value="القصار">القصار</option>
-                            <option value="الوعب">الوعب</option>
-                            <option value="المرخية">المرخية</option>
-                            <option value="عين خالد">عين خالد</option>
-                            <option value="معيذر">معيذر</option>
-                            <option value="أبو هامور">أبو هامور</option>
-                        </select>
-                    </div>
-                    <div>
-                        <input type="number" id="filter-max-price" placeholder="الحد الأقصى للسعر (ر.ق)" aria-label="الحد الأقصى للسعر">
-                    </div>
-                    <button class="btn-gold" onclick="applyFilters()">بحث وتصفية</button>
-                </div>
-            </div>
-
-            <div class="section-title">الإعلانات العقارية المتوفرة</div>
-            <div class="ads-grid" id="main-ads-grid">
-                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">جاري تحميل الإعلانات...</div>
-            </div>
-
-            <div class="section-title">حاسبة التمويل العقاري</div>
-            <div class="calc-section">
-                <div class="calc-form">
-                    <div>
-                        <label for="calc-price">سعر العقار (ر.ق):</label>
-                        <input type="number" id="calc-price" placeholder="أدخل سعر العقار" oninput="calculate()">
-                    </div>
-                    <div>
-                        <label for="calc-downpayment">الدفعة الأولى (ر.ق):</label>
-                        <input type="number" id="calc-downpayment" placeholder="أدخل الدفعة الأولى" oninput="calculate()">
-                    </div>
-                    <div>
-                        <label for="calc-years">مدة القرض (سنوات):</label>
-                        <input type="number" id="calc-years" placeholder="أدخل مدة القرض" oninput="calculate()">
-                    </div>
-                </div>
-                <div class="calc-result" id="result">القسط الشهري التقديري: 0 ر.ق</div>
-            </div>
-
-            <div class="section-title">حاسبة الإيجار السنوي</div>
-            <div class="calc-section">
-                <div class="calc-form">
-                    <div>
-                        <label for="calc-monthly-rent">الإيجار الشهري (ر.ق):</label>
-                        <input type="number" id="calc-monthly-rent" placeholder="أدخل الإيجار الشهري" oninput="calculateRent()">
-                    </div>
-                </div>
-                <div class="calc-result" id="rent-result">إجمالي الإيجار السنوي (12 شهر): 0 ر.ق</div>
-            </div>
-
-            <div class="section-title">تواصل معنا</div>
-            <div class="about-section contact-section">
-                <a href="https://wa.me/97433293328" target="_blank">📱 تواصل معنا عبر الواتساب: 97433293328+</a>
-                <a href="https://www.instagram.com/abds_31" target="_blank">📷 تابعنا على الإنستقرام: abds_31</a>
-            </div>
-        </div>
-
-        <!-- صفحة بيوت الإيجار -->
-        <div id="rent" class="page-view">
-            <div class="section-title">بيوت للإيجار</div>
-            <div class="ads-grid" id="rent-ads-grid">
-                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات إيجار حالياً.</div>
-            </div>
-        </div>
-
-        <!-- صفحة بيوت للبيع -->
-        <div id="sale" class="page-view">
-            <div class="section-title">بيوت للبيع</div>
-            <div class="ads-grid" id="sale-ads-grid">
-                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات بيع حالياً.</div>
-            </div>
-        </div>
-
-        <!-- صفحة المفضلة -->
-        <div id="favorites" class="page-view">
-            <div class="section-title">العقارات المفضلة لديك</div>
-            <div class="ads-grid" id="fav-container">
-                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لم تقم بإضافة أي عقارات للمفضلة حتى الآن.</div>
-            </div>
-        </div>
-
-        <!-- صفحة تسجيل الدخول -->
-        <div id="auth" class="page-view">
-            <div class="section-title">تسجيل الدخول برقم الجوال</div>
-            <div style="max-width: 400px; margin: 0 auto;">
-                <div class="auth-box">
-                    <form onsubmit="loginUser(event)">
-                        <input type="tel" id="login-phone" placeholder="رقم الجوال (مثال: +974...)" aria-label="رقم الجوال" required>
-                        <button type="submit" class="btn-gold" style="width: 100%; margin-top: 15px;">تسجيل الدخول</button>
-                    </form>
-                    <p style="text-align: center; margin-top: 20px; color: var(--text-muted);">
-                        ليس لديك حساب؟ <a href="#" onclick="switchPage('register')" style="color: var(--gold);">إنشاء حساب جديد</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- صفحة إنشاء الحساب -->
-        <div id="register" class="page-view">
-            <div class="section-title">إنشاء حساب جديد</div>
-            <div style="max-width: 600px; margin: 0 auto;">
-                <div class="auth-box">
-                    <form onsubmit="registerUser(event)">
-                        <div class="profile-img-upload" onclick="document.getElementById('register-pic-input').click()">
-                            <span id="upload-text">صورة شخصية</span>
-                            <img id="register-img-preview" src="" alt="الصورة الشخصية">
-                        </div>
-                        <input type="file" id="register-pic-input" accept="image/*" style="display: none;" onchange="loadRegisterPic(event)">
-
-                        <input type="text" id="reg-name" placeholder="الاسم الكامل" aria-label="الاسم الكامل" required>
-                        <input type="tel" id="reg-phone" placeholder="رقم الجوال (مثال: +974...)" aria-label="رقم الجوال" required>
-                        <button type="submit" class="btn-gold" style="width: 100%; margin-top: 15px;">إنشاء حساب</button>
-                    </form>
-                    <p style="text-align: center; margin-top: 20px; color: var(--text-muted);">
-                        لديك حساب بالفعل؟ <a href="#" onclick="switchPage('auth')" style="color: var(--gold);">تسجيل الدخول</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- صفحة الملف التعريفي -->
-        <div id="profile" class="page-view">
-            <div class="section-title">الملف التعريفي</div>
-            <div class="profile-box" style="max-width: 600px; margin: 0 auto; text-align: center;">
-                <div class="profile-img-upload">
-                    <img id="profile-img-preview" src="" alt="الصورة الشخصية" style="display: block;">
-                </div>
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// متغير عام لحفظ البيانات محلياً بشكل دائم
+List<TenantCategory> globalCategories = [];
+
+void main() async {
+  // التأكد من تهيئة بيئة Flutter قبل جلب البيانات الدائمة
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // استرجاع البيانات من الذاكرة الدائمة قبل تشغيل التطبيق
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    String? encodedData = prefs.getString('persistent_tenant_categories_key');
+    if (encodedData != null && encodedData.isNotEmpty) {
+      List decodedList = jsonDecode(encodedData);
+      globalCategories = decodedList.map((e) => TenantCategory.fromJson(e)).toList();
+    }
+  } catch (e) {
+    debugPrint('خطأ في استرجاع البيانات الدائمة: $e');
+  }
+
+  runApp(const TenantManagerApp());
+}
+
+class TenantManagerApp extends StatelessWidget {
+  const TenantManagerApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'إدارة الايجارات',
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: child!,
+        );
+      },
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        primaryColor: const Color(0xFFFFD700),
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFFFFD700),
+          secondary: Color(0xFFDAA520),
+          surface: Color(0xFF1E1E1E),
+        ),
+      ),
+      home: const CategoryHomePage(),
+    );
+  }
+}
+
+class Tenant {
+  String name;
+  String phone;
+  double price;
+  bool hasPaid;
+  String lastPaidDate;
+
+  Tenant({
+    required this.name,
+    required this.phone,
+    required this.price,
+    this.hasPaid = false,
+    required this.lastPaidDate,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'phone': phone,
+        'price': price,
+        'hasPaid': hasPaid,
+        'lastPaidDate': lastPaidDate,
+      };
+
+  factory Tenant.fromJson(Map<String, dynamic> json) => Tenant(
+        name: json['name'] ?? '',
+        phone: json['phone'] ?? '',
+        price: (json['price'] as num?)?.toDouble() ?? 0.0,
+        hasPaid: json['hasPaid'] ?? false,
+        lastPaidDate: json['lastPaidDate'] ?? DateTime.now().toIso8601String(),
+      );
+}
+
+class TenantCategory {
+  String categoryName;
+  List<Tenant> tenants;
+
+  TenantCategory({
+    required this.categoryName,
+    required this.tenants,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'categoryName': categoryName,
+        'tenants': tenants.map((e) => e.toJson()).toList(),
+      };
+
+  factory TenantCategory.fromJson(Map<String, dynamic> json) => TenantCategory(
+        categoryName: json['categoryName'] ?? '',
+        tenants: (json['tenants'] as List?)
+                ?.map((e) => Tenant.fromJson(e))
+                .toList() ??
+            [],
+      );
+}
+
+class CategoryHomePage extends StatefulWidget {
+  const CategoryHomePage({super.key});
+
+  @override
+  State<CategoryHomePage> createState() => _CategoryHomePageState();
+}
+
+class _CategoryHomePageState extends State<CategoryHomePage> {
+  late List<TenantCategory> categories;
+  final TextEditingController categoryController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    categories = globalCategories;
+  }
+
+  // دالة الحفظ المباشر في الذاكرة الدائمة للجهاز
+  Future<void> saveToPermanentStorage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String encodedData = jsonEncode(categories.map((e) => e.toJson()).toList());
+      await prefs.setString('persistent_tenant_categories_key', encodedData);
+    } catch (e) {
+      debugPrint('خطأ في حفظ البيانات بالذاكرة الدائمة: $e');
+    }
+  }
+
+  Future<void> addCategory() async {
+    if (categoryController.text.trim().isEmpty) return;
+    
+    setState(() {
+      categories.add(TenantCategory(
+        categoryName: categoryController.text.trim(),
+        tenants: [],
+      ));
+      categoryController.clear();
+    });
+
+    await saveToPermanentStorage();
+    
+    if (!mounted) return;
+    Navigator.pop(context);
+  }
+
+  void showAddCategoryDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        title: const Text('إضافة قائمة جديدة', style: TextStyle(color: Color(0xFFFFD700))),
+        content: TextField(
+          controller: categoryController,
+          decoration: const InputDecoration(
+            labelText: 'اسم القائمة',
+            labelStyle: TextStyle(color: Color(0xFFFFD700)),
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: const Text('إلغاء', style: TextStyle(color: Colors.grey)),
+            onPressed: () => Navigator.pop(context),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700)),
+            onPressed: addCategory,
+            child: const Text('إضافة', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void resetAllMonths() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        title: const Text('تحديث بداية الشهر', style: TextStyle(color: Color(0xFFFFD700))),
+        content: const Text('هل تريد تصفير جميع حالات الدفع لكل القوائم؟'),
+        actions: [
+          TextButton(
+            child: const Text('إلغاء', style: TextStyle(color: Colors.grey)),
+            onPressed: () => Navigator.pop(context),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700)),
+            onPressed: () async {
+              setState(() {
+                for (var cat in categories) {
+                  for (var t in cat.tenants) {
+                    t.hasPaid = false;
+                  }
+                }
+              });
+              await saveToPermanentStorage();
+              
+              if (!mounted) return;
+              Navigator.pop(context);
+            },
+            child: const Text('تأكيد', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('إدارة الايجارات', style: TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF181818),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Color(0xFFFFD700)),
+            tooltip: 'تحديث الشهور (تصفير)',
+            onPressed: resetAllMonths,
+          ),
+        ],
+      ),
+      body: categories.isEmpty
+          ? const Center(
+              child: Text('لا توجد قوائم مضافة حالياً. اضغط على زر + لإنشاء قائمة جديدة',
+                  style: TextStyle(color: Colors.grey), textAlign: TextAlign.center),
+            )
+          : ListView.builder(
+              itemCount: categories.length,
+              itemBuilder: (context, catIndex) {
+                final category = categories[catIndex];
                 
-                <h3 id="profile-name" style="color: var(--gold); margin-bottom: 5px;">اسم المستخدم</h3>
-                <p id="profile-phone" style="color: var(--text-muted); margin-top: 0;">+97400000000</p>
+                double catTotalPrice = category.tenants.fold(0, (sum, t) => sum + t.price);
+                double catPaidPrice = category.tenants.where((t) => t.hasPaid).fold(0, (sum, t) => sum + t.price);
 
-                <div style="margin-top: 20px; text-align: right;">
-                    <h4 style="color: var(--gold); border-bottom: 1px solid #333; padding-bottom: 8px;">إعلاناتي</h4>
-                    <div id="user-ads-list">
-                        <p style="color: var(--text-muted);">لا توجد إعلانات مضافة حالياً.</p>
-                    </div>
-                </div>
-
-                <button class="btn-outline" onclick="logoutUser()" style="margin-top: 20px; width: 100%;">تسجيل الخروج</button>
-            </div>
-        </div>
-
-        <!-- صفحة الأخبار -->
-        <div id="news" class="page-view">
-            <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
-                <span>أخبار العقارات</span>
-                <button class="btn-gold" onclick="openAddNewsModal()" style="font-size: 11px; padding: 4px 10px;">+ إضافة خبر جديد</button>
-            </div>
-            <div id="news-grid">جاري تحميل الأخبار...</div>
-        </div>
-
-        <!-- صفحة إضافة / تعديل إعلان -->
-        <div id="add-ad" class="page-view">
-            <div class="section-title" id="form-page-title">إضافة إعلان جديد</div>
-            <div class="ad-form" style="max-width: 800px; margin: 0 auto;">
-                <form id="adForm" onsubmit="saveAd(event)">
-                    <input type="hidden" id="editing-ad-id">
-                    <input type="text" id="ad-title-input" placeholder="عنوان الإعلان" aria-label="عنوان الإعلان" required>
-                    
-                    <textarea id="ad-desc-input" placeholder="وصف العقار" rows="4" aria-label="وصف العقار" required></textarea>
-                    
-                    <select id="ad-purpose-input" aria-label="غرض الإعلان" required>
-                        <option value="" disabled selected>غرض الإعلان</option>
-                        <option value="sale">للبيع</option>
-                        <option value="rent">للإيجار</option>
-                    </select>
-
-                    <select id="ad-type-input" aria-label="نوع العقار" required>
-                        <option value="" disabled selected>نوع العقار</option>
-                        <option value="villa">فيلا</option>
-                        <option value="apartment">شقة</option>
-                        <option value="land">أرض</option>
-                        <option value="chalet">شاليه</option>
-                        <option value="commercial">تجاري</option>
-                    </select>
-
-                    <input type="number" id="ad-price-input" placeholder="السعر (ر.ق)" aria-label="السعر" required>
-                    
-                    <select id="ad-city-input" aria-label="اختر المنطقة أو البلدية" required>
-                        <option value="" disabled selected>اختر المنطقة أو البلدية</option>
-                        <option value="الدوحة">الدوحة</option>
-                        <option value="الريان">الريان</option>
-                        <option value="الوكرة">الوكرة</option>
-                        <option value="الخور">الخور والذكيرة</option>
-                        <option value="الضعاين">الضعاين</option>
-                        <option value="الشمال">الشمال</option>
-                        <option value="الشيحانية">الشيحانية</option>
-                        <option value="أم صلال">أم صلال</option>
-                        <option value="مسيعيد">مسيعيد</option>
-                        <option value="دخان">دخان</option>
-                        <option value="لوسيل">لوسيل</option>
-                        <option value="اللؤلؤة">اللؤلؤة</option>
-                        <option value="القصار">القصار</option>
-                        <option value="الوعب">الوعب</option>
-                        <option value="المرخية">المرخية</option>
-                        <option value="عين خالد">عين خالد</option>
-                        <option value="معيذر">معيذر</option>
-                        <option value="أبو هامور">أبو هامور</option>
-                    </select>
-
-                    <div style="margin-top: 15px;">
-                        <label style="color: var(--gold); font-weight: bold; display: block; margin-bottom: 5px;">حدد الموقع بدقة على خريطة قطر:</label>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
-                            <div class="coordinates-info" id="coords-text" style="margin-bottom: 0;">اضغط على الخريطة لتحديد موقع العقار بدقة</div>
-                            <button type="button" class="btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="locateUserPosition()">📍 تحديد موقعي تلقائياً</button>
-                        </div>
-                        <div id="map"></div>
-                        <input type="hidden" id="ad-lat">
-                        <input type="hidden" id="ad-lng">
-                    </div>
-                    
-                    <div style="color: var(--text-color); margin-top: 15px; font-weight: bold;">رفع الصور (بحد أقصى 10 صور):</div>
-                    <input type="file" id="ad-images-input" accept="image/*" multiple aria-label="رفع الصور">
-                    
-                    <div style="color: var(--text-color); margin-top: 15px; font-weight: bold;">رفع الفيديوهات (بحد أقصى 3 فيديوهات):</div>
-                    <input type="file" id="ad-videos-input" accept="video/*" multiple aria-label="رفع الفيديوهات">
-                    
-                    <button type="submit" class="btn-gold" style="width: 100%; margin-top: 20px;" id="submit-btn-text">نشر الإعلان</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- صفحة عرض الإعلان بالكامل -->
-        <div id="ad-details-page" class="page-view">
-            <button class="btn-outline" onclick="switchPage('home')">← العودة للرئيسية</button>
-            <div class="ad-full-page">
-                <h2 id="full-ad-title" style="color: var(--gold); margin-bottom: 10px;"></h2>
-                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;" id="full-ad-meta"></div>
-                
-                <div class="media-gallery" id="full-ad-media"></div>
-
-                <div style="font-size: 16px; color: var(--text-color); margin-bottom: 20px;" id="full-ad-desc"></div>
-                
-                <div class="ad-footer">
-                    <span id="full-ad-price" style="font-size: 20px; color: var(--gold);"></span>
-                    <span class="views-badge" id="full-ad-views"></span>
-                </div>
-
-                <div style="margin-top: 20px;">
-                    <label style="color: var(--gold); font-weight: bold; display: block; margin-bottom: 5px;">موقع العقار على الخريطة:</label>
-                    <div id="full-ad-map"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        <p>جميع الحقوق محفوظة ©️ المواثيق العقارية</p>
-    </footer>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDmtFl-ozeXhUq4WPQHIXQ7ydOCo1hEeQA",
-            authDomain: "abdullah-1d45c.firebaseapp.com",
-            projectId: "abdullah-1d45c",
-            storageBucket: "abdullah-1d45c.firebasestorage.app",
-            messagingSenderId: "467402407857",
-            appId: "1:467402407857:web:3d0e662942f3ff78de0790",
-            measurementId: "G-98MHR2EDQ6"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const db = getFirestore(app);
-
-        let map, marker, fullMap, fullMarker;
-        let allAds = [];
-        
-        let newsList = JSON.parse(localStorage.getItem('almawathiq_news')) || [];
-        let favorites = JSON.parse(localStorage.getItem('almawathiq_favs')) || [];
-        let isLoggedIn = false;
-        let currentUser = { name: '', phone: '' };
-
-        function initMap() {
-            map = L.map('map').setView([25.2854, 51.5310], 11);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-
-            map.on('click', function(e) {
-                setMarkerPosition(e.latlng.lat, e.latlng.lng);
-            });
-        }
-
-        function setMarkerPosition(lat, lng) {
-            document.getElementById('ad-lat').value = lat;
-            document.getElementById('ad-lng').value = lng;
-            document.getElementById('coords-text').innerText = `تم تحديد الإحداثيات: (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-
-            const latLng = [lat, lng];
-            if (marker) {
-                marker.setLatLng(latLng);
-            } else {
-                marker = L.marker(latLng).addTo(map);
-            }
-            map.setView(latLng, 14);
-        }
-
-        window.locateUserPosition = function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        setMarkerPosition(position.coords.latitude, position.coords.longitude);
-                    },
-                    () => {
-                        alert('تعذر تحديد الموقع. يرجى الضغط يدوياً على الخريطة.');
-                    },
-                    { enableHighAccuracy: true }
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E1E1E),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFFFD700), width: 1),
+                  ),
+                  child: ExpansionTile(
+                    initiallyExpanded: false,
+                    collapsedIconColor: const Color(0xFFFFD700),
+                    iconColor: const Color(0xFFFFD700),
+                    title: Text(
+                      category.categoryName,
+                      style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                    subtitle: Text(
+                      'إجمالي الإيجارات: $catTotalPrice ر.س | المحصل: $catPaidPrice ر.س',
+                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.redAccent),
+                          onPressed: () async {
+                            setState(() {
+                              categories.removeAt(catIndex);
+                            });
+                            await saveToPermanentStorage();
+                          },
+                        ),
+                        const Icon(Icons.arrow_drop_down, color: Color(0xFFFFD700)),
+                      ],
+                    ),
+                    children: [
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: category.tenants.length,
+                        itemBuilder: (context, tenantIndex) {
+                          final tenant = category.tenants[tenantIndex];
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2A2A2A),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ListTile(
+                              title: Text(tenant.name, style: const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)),
+                              subtitle: Text('الهاتف: ${tenant.phone}\nالسعر: ${tenant.price} ر.س',
+                                  style: const TextStyle(color: Colors.white70)),
+                              isThreeLine: true,
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.check_circle,
+                                      color: tenant.hasPaid ? Colors.greenAccent : Colors.grey,
+                                      size: 30,
+                                    ),
+                                    tooltip: 'تأكيد الدفع',
+                                    onPressed: () async {
+                                      setState(() {
+                                        tenant.hasPaid = !tenant.hasPaid;
+                                        tenant.lastPaidDate = DateTime.now().toIso8601String();
+                                      });
+                                      await saveToPermanentStorage();
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                    onPressed: () async {
+                                      setState(() {
+                                        category.tenants.removeAt(tenantIndex);
+                                      });
+                                      await saveToPermanentStorage();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700)),
+                          icon: const Icon(Icons.add, color: Colors.black),
+                          label: const Text('إضافة مؤجر لهذه القائمة', style: TextStyle(color: Colors.black)),
+                          onPressed: () => showAddTenantDialog(catIndex),
+                        ),
+                      ),
+                    ],
+                  ),
                 );
-            } else {
-                alert('المتصفح لا يدعم تحديد الموقع.');
-            }
-        }
+              },
+            ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFFFFD700),
+        child: const Icon(Icons.create_new_folder, color: Colors.black),
+        onPressed: showAddCategoryDialog,
+      ),
+    );
+  }
 
-        window.onload = async function() {
-            initMap();
-            renderNews();
-            await loadAdsFromFirebase();
-            updateFavoritesView();
-        };
+  void showAddTenantDialog(int catIndex) {
+    final TextEditingController nameC = TextEditingController();
+    final TextEditingController phoneC = TextEditingController();
+    final TextEditingController priceC = TextEditingController();
 
-        window.switchPage = function(pageId) {
-            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            window.scrollTo(0, 0);
-            if(pageId === 'add-ad' && map) map.invalidateSize();
-            if(pageId === 'home') renderAllAds();
-        }
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        title: const Text('إضافة مؤجر جديد', style: TextStyle(color: Color(0xFFFFD700))),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: nameC, decoration: const InputDecoration(labelText: 'اسم المؤجر', labelStyle: TextStyle(color: Color(0xFFFFD700)))),
+              TextField(controller: phoneC, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'رقم التواصل', labelStyle: TextStyle(color: Color(0xFFFFD700)))),
+              TextField(controller: priceC, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'سعر الإيجار', labelStyle: TextStyle(color: Color(0xFFFFD700)))),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: const Text('إلغاء', style: TextStyle(color: Colors.grey)),
+            onPressed: () => Navigator.pop(context),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFD700)),
+            onPressed: () async {
+              if (nameC.text.trim().isEmpty || priceC.text.trim().isEmpty) return;
+              double? price = double.tryParse(priceC.text);
+              if (price == null) return;
 
-        window.handleAccountClick = function() {
-            isLoggedIn ? switchPage('profile') : switchPage('auth');
-        }
+              setState(() {
+                categories[catIndex].tenants.add(Tenant(
+                      name: nameC.text.trim(),
+                      phone: phoneC.text.trim(),
+                      price: price,
+                      lastPaidDate: DateTime.now().toIso8601String(),
+                    ));
+              });
 
-        window.loginUser = function(event) {
-            event.preventDefault();
-            currentUser.phone = document.getElementById('login-phone').value;
-            currentUser.name = "مستخدم الجوال";
-            isLoggedIn = true;
-            document.getElementById('account-btn').innerText = "الملف التعريفي";
-            updateProfileView();
-            switchPage('profile');
-        }
+              await saveToPermanentStorage();
 
-        window.registerUser = function(event) {
-            event.preventDefault();
-            currentUser.name = document.getElementById('reg-name').value;
-            currentUser.phone = document.getElementById('reg-phone').value;
-            isLoggedIn = true;
-            document.getElementById('account-btn').innerText = "الملف التعريفي";
-            updateProfileView();
-            switchPage('profile');
-        }
-
-        window.logoutUser = function() {
-            isLoggedIn = false;
-            document.getElementById('account-btn').innerText = "تسجيل الدخول";
-            switchPage('home');
-        }
-
-        function updateProfileView() {
-            document.getElementById('profile-name').innerText = currentUser.name;
-            document.getElementById('profile-phone').innerText = currentUser.phone;
-            renderAllAds();
-        }
-
-        window.loadRegisterPic = function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById('register-img-preview');
-                    img.src = e.target.result;
-                    img.style.display = 'block';
-                    document.getElementById('upload-text').style.display = 'none';
-                    document.getElementById('profile-img-preview').src = e.target.result;
-                    document.getElementById('profile-img-preview').style.display = 'block';
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        async function loadAdsFromFirebase() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "abdullah"));
-                allAds = [];
-                querySnapshot.forEach((docSnap) => {
-                    allAds.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                renderAllAds();
-            } catch (error) {
-                console.error("خطأ في جلب الإعلانات: ", error);
-                document.getElementById('main-ads-grid').innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">حدث خطأ في تحميل الإعلانات من قاعدة البيانات.</div>';
-            }
-        }
-
-        window.prepareAddAd = function() {
-            document.getElementById('adForm').reset();
-            document.getElementById('editing-ad-id').value = '';
-            document.getElementById('form-page-title').innerText = "إضافة إعلان جديد";
-            document.getElementById('submit-btn-text').innerText = "نشر الإعلان";
-            if(marker) { map.removeLayer(marker); marker = null; }
-            document.getElementById('coords-text').innerText = "اضغط على الخريطة لتحديد موقع العقار بدقة";
-            switchPage('add-ad');
-        }
-
-        window.editAd = function(id, event) {
-            if(event) event.stopPropagation();
-            const ad = allAds.find(a => a.id === id);
-            if(!ad) return;
-
-            document.getElementById('editing-ad-id').value = ad.id;
-            document.getElementById('ad-title-input').value = ad.title || '';
-            document.getElementById('ad-desc-input').value = ad.description || '';
-            document.getElementById('ad-purpose-input').value = ad.purpose || '';
-            document.getElementById('ad-type-input').value = ad.type || '';
-            document.getElementById('ad-price-input').value = ad.price || '';
-            document.getElementById('ad-city-input').value = ad.city || '';
-            document.getElementById('ad-lat').value = ad.lat || '';
-            document.getElementById('ad-lng').value = ad.lng || '';
-
-            document.getElementById('form-page-title').innerText = "تعديل الإعلان";
-            document.getElementById('submit-btn-text').innerText = "حفظ التعديلات";
-
-            if (ad.lat && ad.lng) {
-                setMarkerPosition(parseFloat(ad.lat), parseFloat(ad.lng));
-            } else if(marker) {
-                map.removeLayer(marker);
-                marker = null;
-                document.getElementById('coords-text').innerText = "اضغط على الخريطة لتحديد موقع العقار بدقة";
-            }
-
-            switchPage('add-ad');
-        }
-
-        window.saveAd = async function(event) {
-            event.preventDefault();
-
-            const editingId = document.getElementById('editing-ad-id').value;
-            const imageFiles = document.getElementById('ad-images-input').files;
-            const videoFiles = document.getElementById('ad-videos-input').files;
-
-            let images = [];
-            let videos = [];
-
-            if (editingId) {
-                const existingAd = allAds.find(a => a.id === editingId);
-                images = existingAd.images || [];
-                videos = existingAd.videos || [];
-            }
-
-            for (let file of imageFiles) {
-                const base64 = await toBase64(file);
-                images.push(base64);
-            }
-
-            for (let file of videoFiles) {
-                const base64 = await toBase64(file);
-                videos.push(base64);
-            }
-
-            const adData = {
-                title: document.getElementById('ad-title-input').value,
-                description: document.getElementById('ad-desc-input').value,
-                purpose: document.getElementById('ad-purpose-input').value,
-                type: document.getElementById('ad-type-input').value,
-                price: parseFloat(document.getElementById('ad-price-input').value),
-                city: document.getElementById('ad-city-input').value,
-                lat: document.getElementById('ad-lat').value || "",
-                lng: document.getElementById('ad-lng').value || "",
-                images: images,
-                videos: videos,
-                date: new Date().toLocaleDateString('ar-QA')
-            };
-
-            try {
-                if (editingId) {
-                    const adRef = doc(db, "abdullah", editingId);
-                    await updateDoc(adRef, adData);
-                    const index = allAds.findIndex(a => a.id === editingId);
-                    if (index > -1) {
-                        allAds[index] = { id: editingId, ...allAds[index], ...adData };
-                    }
-                    alert('تم تعديل الإعلان بنجاح!');
-                } else {
-                    adData.views = 0;
-                    const docRef = await addDoc(collection(db, "abdullah"), adData);
-                    adData.id = docRef.id;
-                    allAds.unshift(adData);
-                    alert('تم نشر الإعلان بنجاح في قاعدة البيانات!');
-                }
-
-                event.target.reset();
-                if(marker) { map.removeLayer(marker); marker = null; }
-                switchPage('home');
-                renderAllAds();
-            } catch (error) {
-                console.error("خطأ أثناء حفظ الإعلان: ", error);
-                alert('حدث خطأ أثناء حفظ الإعلان.');
-            }
-        }
-
-        function toBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        window.deleteAd = async function(id, event) {
-            if(event) event.stopPropagation();
-            if (confirm('هل أنت متأكد من حذف هذا الإعلان من قاعدة البيانات؟')) {
-                try {
-                    await deleteDoc(doc(db, "abdullah", id));
-                    allAds = allAds.filter(ad => ad.id !== id);
-                    favorites = favorites.filter(fav => fav.id !== id);
-                    saveToLocalStorage();
-                    renderAllAds();
-                    updateFavoritesView();
-                    renderUserAds();
-                    alert('تم الحذف بنجاح.');
-                } catch (error) {
-                    console.error("خطأ في الحذف: ", error);
-                    alert('تعذر حذف الإعلان.');
-                }
-            }
-        }
-
-        function saveToLocalStorage() {
-            localStorage.setItem('almawathiq_favs', JSON.stringify(favorites));
-        }
-
-        function renderAllAds() {
-            const mainContainer = document.getElementById('main-ads-grid');
-            const rentContainer = document.getElementById('rent-ads-grid');
-            const saleContainer = document.getElementById('sale-ads-grid');
-
-            if (allAds.length === 0) {
-                const emptyMsg = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات منشورة حالياً. أضف إعلانك الأول!</div>';
-                mainContainer.innerHTML = emptyMsg;
-                rentContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات إيجار حالياً.</div>';
-                saleContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات بيع حالياً.</div>';
-                renderUserAds();
-                return;
-            }
-
-            let mainHtml = '', rentHtml = '', saleHtml = '';
-
-            allAds.forEach(ad => {
-                const isFav = favorites.some(f => f.id === ad.id);
-                const mediaHtml = (ad.images && ad.images.length > 0) ? 
-                    `<img src="${ad.images[0]}" alt="${ad.title}">` : 
-                    ((ad.videos && ad.videos.length > 0) ? `<video src="${ad.videos[0]}"></video>` : 'لا توجد صور');
-
-                const cardHtml = `
-                    <div class="ad-card" data-type="${ad.type}" data-city="${ad.city}" data-price="${ad.price}" onclick="viewAdDetails('${ad.id}')">
-                        <button class="fav-btn" style="color: ${isFav ? 'var(--gold)' : 'inherit'};" onclick="toggleFavorite('${ad.id}', event)">♥️</button>
-                        <button class="share-btn" onclick="shareAd('${ad.id}', event)">📤</button>
-                        <div class="ad-img">${mediaHtml}</div>
-                        <div class="ad-content">
-                            <div class="ad-title">${ad.title}</div>
-                            <div class="ad-details">${ad.description ? ad.description.substring(0, 40) : ''}...</div>
-                            <div style="font-size: 11px; color: var(--gold-light); margin-bottom: 8px;">المنطقة: ${ad.city}</div>
-                            <div class="ad-footer">
-                                <span>${ad.price ? ad.price.toLocaleString() : 0} ر.ق</span>
-                                <span class="views-badge">المشاهدات: ${ad.views || 0}</span>
-                            </div>
-                            <div style="display: flex; gap: 5px;">
-                                <button class="btn-edit-ad" onclick="editAd('${ad.id}', event)">تعديل</button>
-                                <button class="btn-delete-ad" onclick="deleteAd('${ad.id}', event)">حذف</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                mainHtml += cardHtml;
-                if (ad.purpose === 'rent') rentHtml += cardHtml;
-                if (ad.purpose === 'sale') saleHtml += cardHtml;
-            });
-
-            mainContainer.innerHTML = mainHtml;
-            rentContainer.innerHTML = rentHtml || '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات إيجار حالياً.</div>';
-            saleContainer.innerHTML = saleHtml || '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات بيع حالياً.</div>';
-
-            renderUserAds();
-        }
-
-        function renderUserAds() {
-            const list = document.getElementById('user-ads-list');
-            list.innerHTML = allAds.length === 0 ? '<p style="color: var(--text-muted);">لا توجد إعلانات مضافة حالياً.</p>' :
-                allAds.map(ad => `
-                    <div style="background: #111; padding: 10px; border-radius: 5px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
-                        <div>
-                            <strong style="color: var(--gold);">${ad.title}</strong>
-                            <div style="font-size: 11px; color: var(--text-muted);">${ad.city} - ${ad.price ? ad.price.toLocaleString() : 0} ر.ق</div>
-                        </div>
-                        <div style="display: flex; gap: 5px;">
-                            <button class="btn-edit-ad" onclick="editAd('${ad.id}', event)" style="margin-top:0;">تعديل</button>
-                            <button class="btn-delete-ad" onclick="deleteAd('${ad.id}', event)" style="margin-top:0;">حذف</button>
-                        </div>
-                    </div>
-                `).join('');
-        }
-
-        window.toggleFavorite = function(adId, event) {
-            event.stopPropagation();
-            const ad = allAds.find(a => a.id === adId);
-            const index = favorites.findIndex(f => f.id === adId);
-            index > -1 ? favorites.splice(index, 1) : favorites.push(ad);
-            saveToLocalStorage();
-            renderAllAds();
-            updateFavoritesView();
-        }
-
-        function updateFavoritesView() {
-            const container = document.getElementById('fav-container');
-            container.innerHTML = favorites.length === 0 ? '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لم تقم بإضافة عقارات للمفضلة.</div>' :
-                favorites.map(ad => `
-                    <div class="ad-card" onclick="viewAdDetails('${ad.id}')">
-                        <button class="fav-btn" style="color: var(--gold);" onclick="toggleFavorite('${ad.id}', event)">♥️</button>
-                        <div class="ad-img"><img src="${ad.images && ad.images[0] ? ad.images[0] : ''}" alt="${ad.title}"></div>
-                        <div class="ad-content">
-                            <div class="ad-title">${ad.title}</div>
-                            <div class="ad-footer"><span>${ad.price ? ad.price.toLocaleString() : 0} ر.ق</span></div>
-                        </div>
-                    </div>
-                `).join('');
-        }
-
-        window.shareAd = function(adId, event) {
-            event.stopPropagation();
-            const ad = allAds.find(a => a.id === adId);
-            if (ad && navigator.share) {
-                navigator.share({
-                    title: ad.title,
-                    text: ad.description,
-                    url: window.location.href
-                }).catch((error) => console.log('خطأ في المشاركة:', error));
-            } else {
-                alert('ميزة المشاركة غير مدعومة في متصفحك.');
-            }
-        }
-
-        window.viewAdDetails = async function(adId) {
-            const ad = allAds.find(a => a.id === adId);
-            if (!ad) return;
-            
-            try {
-                const adRef = doc(db, "abdullah", adId);
-                await updateDoc(adRef, {
-                    views: increment(1)
-                });
-                ad.views = (ad.views || 0) + 1;
-            } catch (e) {
-                console.log("خطأ في تحديث المشاهدات", e);
-            }
-
-            document.getElementById('full-ad-title').innerText = ad.title;
-            document.getElementById('full-ad-meta').innerText = `المنطقة: ${ad.city} | النوع: ${ad.type} | التاريخ: ${ad.date}`;
-            document.getElementById('full-ad-desc').innerText = ad.description;
-            document.getElementById('full-ad-price').innerText = `${ad.price ? ad.price.toLocaleString() : 0} ر.ق`;
-            document.getElementById('full-ad-views').innerText = `المشاهدات: ${ad.views || 0}`;
-
-            const mediaContainer = document.getElementById('full-ad-media');
-            mediaContainer.innerHTML = '';
-            
-            if (ad.images) {
-                ad.images.forEach(img => {
-                    mediaContainer.innerHTML += `<div class="media-item"><img src="${img}" alt="صورة العقار"></div>`;
-                });
-            }
-            
-            if (ad.videos) {
-                ad.videos.forEach(vid => {
-                    mediaContainer.innerHTML += `<div class="media-item"><video src="${vid}" controls></video></div>`;
-                });
-            }
-
-            switchPage('ad-details-page');
-
-            if (ad.lat && ad.lng) {
-                setTimeout(() => {
-                    const lat = parseFloat(ad.lat);
-                    const lng = parseFloat(ad.lng);
-                    if (!fullMap) {
-                        fullMap = L.map('full-ad-map').setView([lat, lng], 14);
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            attribution: '&copy; OpenStreetMap contributors'
-                        }).addTo(fullMap);
-                    } else {
-                        fullMap.invalidateSize();
-                        fullMap.setView([lat, lng], 14);
-                    }
-                    if (fullMarker) {
-                        fullMarker.setLatLng([lat, lng]);
-                    } else {
-                        fullMarker = L.marker([lat, lng]).addTo(fullMap);
-                    }
-                }, 300);
-            }
-        }
-
-        window.applyFilters = function() {
-            const selectedType = document.getElementById('filter-type').value;
-            const selectedCity = document.getElementById('filter-city').value;
-            const maxPrice = parseFloat(document.getElementById('filter-max-price').value) || Infinity;
-
-            document.querySelectorAll('#main-ads-grid .ad-card').forEach(card => {
-                const type = card.getAttribute('data-type');
-                const city = card.getAttribute('data-city');
-                const price = parseFloat(card.getAttribute('data-price'));
-                card.style.display = (!selectedType || type === selectedType) && (!selectedCity || city === selectedCity) && price <= maxPrice ? 'block' : 'none';
-            });
-        }
-
-        window.calculate = function() {
-            const price = parseFloat(document.getElementById('calc-price').value);
-            const downpayment = parseFloat(document.getElementById('calc-downpayment').value);
-            const years = parseFloat(document.getElementById('calc-years').value);
-            if (price > 0 && years > 0) {
-                const loanAmount = price - (downpayment || 0);
-                const monthlyInterestRate = (4 / 100) / 12;
-                const numberOfPayments = years * 12;
-                const monthlyPayment = (loanAmount * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -numberOfPayments));
-                document.getElementById('result').innerText = 'القسط الشهري التقديري: ' + Math.max(0, monthlyPayment).toFixed(0) + ' ر.ق';
-            } else {
-                document.getElementById('result').innerText = 'القسط الشهري التقديري: 0 ر.ق';
-            }
-        }
-
-        window.calculateRent = function() {
-            const monthlyRent = parseFloat(document.getElementById('calc-monthly-rent').value);
-            if (monthlyRent > 0) {
-                document.getElementById('rent-result').innerText = 'إجمالي الإيجار السنوي (12 شهر): ' + (monthlyRent * 12).toFixed(0) + ' ر.ق';
-            } else {
-                document.getElementById('rent-result').innerText = 'إجمالي الإيجار السنوي (12 شهر): 0 ر.ق';
-            }
-        }
-
-        function renderNews() {
-            const newsGrid = document.getElementById('news-grid');
-            if (newsList.length === 0) {
-                newsGrid.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">لا توجد أخبار مضافة حالياً. اضغط على زر "إضافة خبر جديد" لإدراج أخبارك.</div>';
-                return;
-            }
-
-            newsGrid.innerHTML = newsList.map(item => `
-                <div class="news-item">
-                    <div class="news-title">${item.title}</div>
-                    <div class="news-desc">${item.description}</div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                        <span class="news-date">تاريخ النشر: ${item.date}</span>
-                        <button class="btn-delete-ad" onclick="deleteNews('${item.id}')">حذف الخبر</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        window.openAddNewsModal = function() {
-            const title = prompt("أدخل عنوان الخبر العقاري:");
-            if (!title) return;
-            const description = prompt("أدخل تفاصيل ومحتوى الخبر:");
-            if (!description) return;
-
-            const newNewsItem = {
-                id: Date.now().toString(),
-                title: title,
-                description: description,
-                date: new Date().toLocaleDateString('ar-QA')
-            };
-
-            newsList.unshift(newNewsItem);
-            localStorage.setItem('almawathiq_news', JSON.stringify(newsList));
-            renderNews();
-            alert('تم إضافة الخبر بنجاح!');
-        }
-
-        window.deleteNews = function(id) {
-            if (confirm('هل أنت متأكد من حذف هذا الخبر؟')) {
-                newsList = newsList.filter(n => n.id !== id);
-                localStorage.setItem('almawathiq_news', JSON.stringify(newsList));
-                renderNews();
-            }
-        }
-    </script>
-</body>
-</html>
+              if (!mounted) return;
+              Navigator.pop(context);
+            },
+            child: const Text('حفظ', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
+}
