@@ -766,7 +766,7 @@
 
         // إعدادات فايربيس الخاصة بمشروعك
         const firebaseConfig = {
-            apiKey: "AIzaSyD...", // استبدلها بالبيانات الخاصة بك من لوحة تحكم فايربيس
+            apiKey: "AIzaSyD...", 
             authDomain: "abdullah-14d5c.firebaseapp.com",
             projectId: "abdullah-14d5c",
             storageBucket: "abdullah-14d5c.appspot.com",
@@ -891,10 +891,10 @@
             }
         }
 
-        // جلب الإعلانات من قاعدة بيانات Firestore السحابية
+        // جلب الإعلانات من مجموعة "abdullah" في قاعدة بيانات Firestore السحابية
         async function loadAdsFromFirebase() {
             try {
-                const querySnapshot = await getDocs(collection(db, "ads"));
+                const querySnapshot = await getDocs(collection(db, "abdullah"));
                 allAds = [];
                 querySnapshot.forEach((docSnap) => {
                     allAds.push({ id: docSnap.id, ...docSnap.data() });
@@ -906,7 +906,7 @@
             }
         }
 
-        // إضافة إعلان جديد إلى Firestore
+        // إضافة إعلان جديد إلى مجموعة "abdullah" في Firestore
         window.addNewAd = async function(event) {
             event.preventDefault();
 
@@ -941,7 +941,7 @@
             };
 
             try {
-                const docRef = await addDoc(collection(db, "ads"), newAd);
+                const docRef = await addDoc(collection(db, "abdullah"), newAd);
                 newAd.id = docRef.id;
                 allAds.unshift(newAd);
                 saveToLocalStorage();
@@ -970,7 +970,7 @@
             if(event) event.stopPropagation();
             if (confirm('هل أنت متأكد من حذف هذا الإعلان من قاعدة البيانات؟')) {
                 try {
-                    await deleteDoc(doc(db, "ads", id));
+                    await deleteDoc(doc(db, "abdullah", id));
                     allAds = allAds.filter(ad => ad.id !== id);
                     favorites = favorites.filter(fav => fav.id !== id);
                     saveToLocalStorage();
@@ -1098,9 +1098,9 @@
             const ad = allAds.find(a => a.id === adId);
             if (!ad) return;
             
-            // تحديث المشاهدات في قاعدة البيانات
+            // تحديث المشاهدات في مجموعة "abdullah" في قاعدة البيانات
             try {
-                const adRef = doc(db, "ads", adId);
+                const adRef = doc(db, "abdullah", adId);
                 await updateDoc(adRef, {
                     views: increment(1)
                 });
