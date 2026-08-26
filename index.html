@@ -235,6 +235,26 @@
             color: #000;
         }
 
+        .share-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
+            padding: 5px 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 10;
+        }
+
+        .share-btn:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
         .ad-content {
             padding: 20px;
         }
@@ -911,6 +931,7 @@
                 const cardHtml = `
                     <div class="ad-card" data-type="${ad.type}" data-city="${ad.city}" data-price="${ad.price}" onclick="viewAdDetails('${ad.id}')">
                         <button class="fav-btn" style="color: ${isFav ? 'var(--gold)' : 'inherit'};" onclick="toggleFavorite('${ad.id}', event)">♥</button>
+                        <button class="share-btn" onclick="shareAd('${ad.id}', event)">📤</button>
                         <div class="ad-img">${mediaHtml}</div>
                         <div class="ad-content">
                             <div class="ad-title">${ad.title}</div>
@@ -974,6 +995,20 @@
                         </div>
                     </div>
                 `).join('');
+        }
+
+        function shareAd(adId, event) {
+            event.stopPropagation();
+            const ad = allAds.find(a => a.id === adId);
+            if (ad && navigator.share) {
+                navigator.share({
+                    title: ad.title,
+                    text: ad.description,
+                    url: window.location.href
+                }).catch((error) => console.log('خطأ في المشاركة:', error));
+            } else {
+                alert('ميزة المشاركة غير مدعومة في متصفحك.');
+            }
         }
 
         function viewAdDetails(adId) {
