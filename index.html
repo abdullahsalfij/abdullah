@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المواثيق العقارية</title>
+    <!-- مكتبة Leaflet للخرائط التفاعلية -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
             --bg-color: #0b0b0b;
@@ -37,7 +39,6 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            /* الشعار مثبت في أعلى اليمين ولا يمكن للزائر تعديله */
             position: absolute;
             right: 40px;
         }
@@ -298,6 +299,20 @@
             box-sizing: border-box;
         }
 
+        #map {
+            height: 300px;
+            width: 100%;
+            border: 1px solid #444;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .coordinates-info {
+            font-size: 13px;
+            color: var(--gold-light);
+            margin-bottom: 15px;
+        }
+
         .profile-img-upload {
             width: 150px;
             height: 150px;
@@ -349,6 +364,22 @@
             color: #888;
         }
 
+        .btn-delete-ad {
+            background-color: #a94442;
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-delete-ad:hover {
+            background-color: #c9302c;
+        }
+
         footer {
             text-align: center;
             padding: 30px;
@@ -375,7 +406,6 @@
 <body>
 
     <header>
-        <!-- الشعار مثبت في أعلى اليمين ولا يمكن للزوار تعديله -->
         <div class="logo-container">
             <img src="" alt="شعار المواثيق العقارية" class="logo-img" id="brand-logo">
             <div class="logo-text-group">
@@ -404,7 +434,7 @@
                 <p>مرحباً بك في المواثيق العقارية. نحن نبتكر أفضل الحلول العقارية ونوفر منصة متكاملة لعرض وطلب العقارات بأعلى معايير الجودة والفخامة في دولة قطر.</p>
             </div>
 
-            <!-- البحث المتقدم -->
+            <!-- البحث المتقدم (يشمل جميع بلديات قطر) -->
             <div class="section-title">البحث المتقدم</div>
             <div class="filter-section">
                 <div class="filter-grid">
@@ -417,26 +447,35 @@
                         <option value="commercial">تجاري</option>
                     </select>
                     <select id="filter-city">
-                        <option value="">المنطقة (الكل)</option>
-                        <option value="doha">الدوحة</option>
-                        <option value="wakrah">الوكرة</option>
-                        <option value="rayyan">الريان</option>
-                        <option value="khor">الخور</option>
-                        <option value="daayen">الضعاين</option>
-                        <option value="shamal">الشمال</option>
-                        <option value="shahaniya">الشحانية</option>
-                        <option value="ummsalal">أم صلال</option>
-                        <option value="mesaieed">مسيعيد</option>
+                        <option value="">المنطقة/البلدية (الكل)</option>
+                        <option value="الدوحة">الدوحة</option>
+                        <option value="الريان">الريان</option>
+                        <option value="الوكرة">الوكرة</option>
+                        <option value="الخور">الخور والذكيرة</option>
+                        <option value="الضعاين">الضعاين</option>
+                        <option value="الشمال">الشمال</option>
+                        <option value="الشيحانية">الشيحانية</option>
+                        <option value="أم صلال">أم صلال</option>
+                        <option value="مسيعيد">مسيعيد</option>
+                        <option value="دخان">دخان</option>
+                        <option value="لوسيل">لوسيل</option>
+                        <option value="اللؤلؤة">اللؤلؤة</option>
+                        <option value="القصار">القصار</option>
+                        <option value="الوعب">الوعب</option>
+                        <option value="المرخية">المرخية</option>
+                        <option value="عين خالد">عين خالد</option>
+                        <option value="معيذر">معيذر</option>
+                        <option value="أبو هامور">أبو هامور</option>
                     </select>
                     <input type="number" id="filter-max-price" placeholder="الحد الأقصى للسعر (ر.ق)">
                     <button class="btn-gold" onclick="applyFilters()">بحث وتصفية</button>
                 </div>
             </div>
 
-            <!-- الإعلانات المميزة -->
-            <div class="section-title">الإعلانات المميزة</div>
+            <!-- الإعلانات المنشورة -->
+            <div class="section-title">الإعلانات العقارية المتوفرة</div>
             <div class="ads-grid" id="main-ads-grid">
-                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات مميزة حالياً.</div>
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات منشورة حالياً. أضف إعلانك الأول!</div>
             </div>
 
             <!-- متوسط أسعار العقارات في قطر -->
@@ -498,7 +537,7 @@
         <!-- صفحة بيوت الإيجار -->
         <div id="rent" class="page-view">
             <div class="section-title">بيوت للإيجار</div>
-            <div class="ads-grid">
+            <div class="ads-grid" id="rent-ads-grid">
                 <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات إيجار حالياً.</div>
             </div>
         </div>
@@ -506,7 +545,7 @@
         <!-- صفحة بيوت للبيع -->
         <div id="sale" class="page-view">
             <div class="section-title">بيوت للبيع</div>
-            <div class="ads-grid">
+            <div class="ads-grid" id="sale-ads-grid">
                 <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات بيع حالياً.</div>
             </div>
         </div>
@@ -571,7 +610,9 @@
 
                 <div style="margin-top: 30px; text-align: right;">
                     <h4 style="color: var(--gold); border-bottom: 1px solid #333; padding-bottom: 8px;">إعلاناتي</h4>
-                    <p style="color: var(--text-muted);">لا توجد إعلانات مضافة حالياً.</p>
+                    <div id="user-ads-list">
+                        <p style="color: var(--text-muted);">لا توجد إعلانات مضافة حالياً.</p>
+                    </div>
                 </div>
 
                 <button class="btn-outline" onclick="logoutUser()" style="margin-top: 30px; width: 100%;">تسجيل الخروج</button>
@@ -584,15 +625,62 @@
             <div id="news-grid">جاري تحميل الأخبار...</div>
         </div>
 
-        <!-- صفحة إضافة إعلان -->
+        <!-- صفحة إضافة إعلان (مع الخريطة التفاعلية وقائمة مناطق قطر الكاملة) -->
         <div id="add-ad" class="page-view">
             <div class="section-title">إضافة إعلان جديد</div>
             <div class="ad-form" style="max-width: 800px; margin: 0 auto;">
-                <form onsubmit="alert('تم إرسال الإعلان للمراجعة بنجاح'); return false;">
-                    <input type="text" placeholder="عنوان الإعلان" required>
-                    <textarea placeholder="وصف العقار" rows="4" required></textarea>
-                    <input type="number" placeholder="السعر (ر.ق)" required>
-                    <input type="text" placeholder="الموقع / المنطقة" required>
+                <form onsubmit="addNewAd(event)">
+                    <input type="text" id="ad-title-input" placeholder="عنوان الإعلان" required>
+                    <textarea id="ad-desc-input" placeholder="وصف العقار" rows="4" required></textarea>
+                    
+                    <select id="ad-purpose-input" required>
+                        <option value="" disabled selected>غرض الإعلان</option>
+                        <option value="sale">للبيع</option>
+                        <option value="rent">للإيجار</option>
+                    </select>
+
+                    <select id="ad-type-input" required>
+                        <option value="" disabled selected>نوع العقار</option>
+                        <option value="villa">فيلا</option>
+                        <option value="apartment">شقة</option>
+                        <option value="land">أرض</option>
+                        <option value="chalet">شاليه</option>
+                        <option value="commercial">تجاري</option>
+                    </select>
+
+                    <input type="number" id="ad-price-input" placeholder="السعر (ر.ق)" required>
+                    
+                    <!-- قائمة منسدلة تشمل جميع مناطق وبلديات قطر -->
+                    <select id="ad-city-input" required>
+                        <option value="" disabled selected>اختر المنطقة أو البلدية</option>
+                        <option value="الدوحة">الدوحة</option>
+                        <option value="الريان">الريان</option>
+                        <option value="الوكرة">الوكرة</option>
+                        <option value="الخور">الخور والذخيرة</option>
+                        <option value="الضعاين">الضعاين</option>
+                        <option value="الشمال">الشمال</option>
+                        <option value="الشيحانية">الشيحانية</option>
+                        <option value="أم صلال">أم صلال</option>
+                        <option value="مسيعيد">مسيعيد</option>
+                        <option value="دخان">دخان</option>
+                        <option value="لوسيل">لوسيل</option>
+                        <option value="اللؤلؤة">اللؤلؤة</option>
+                        <option value="القصار">القصار</option>
+                        <option value="الوعب">الوعب</option>
+                        <option value="المرخية">المرخية</option>
+                        <option value="عين خالد">عين خالد</option>
+                        <option value="معيذر">معيذر</option>
+                        <option value="أبو هامور">أبو هامور</option>
+                    </select>
+
+                    <!-- الخريطة التفاعلية لتحديد الموقع بدقة -->
+                    <div style="margin-top: 20px;">
+                        <label style="color: var(--gold); font-weight: bold; display: block; margin-bottom: 5px;">حدد الموقع بدقة على خريطة قطر:</label>
+                        <div class="coordinates-info" id="coords-text">اضغط على الخريطة لتحديد موقع العقار بدقة</div>
+                        <div id="map"></div>
+                        <input type="hidden" id="ad-lat">
+                        <input type="hidden" id="ad-lng">
+                    </div>
                     
                     <div style="color: var(--text-color); margin-top: 15px; font-weight: bold;">رفع الصور (بحد أقصى 10 صور):</div>
                     <input type="file" accept="image/*" multiple>
@@ -615,15 +703,51 @@
         <p style="margin-top: 10px;">جميع الحقوق محفوظة &copy; 2026 - المواثيق العقارية</p>
     </footer>
 
+    <!-- سكربت خريطة Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         let isLoggedIn = false;
         let currentUser = { name: "عبدالله", phone: "+97433293328", pic: "" };
+        let allAds = [];
+        let favorites = [];
+
+        // تهيئة الخريطة التفاعلية عند تحميل الصفحة
+        let map, marker;
+        function initMap() {
+            // مركز الخريطة الافتراضي على قطر (الدوحة/الريان)
+            map = L.map('map').setView([25.2854, 51.5310], 11);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            map.on('click', function(e) {
+                let lat = e.latlng.lat;
+                let lng = e.latlng.lng;
+                
+                document.getElementById('ad-lat').value = lat;
+                document.getElementById('ad-lng').value = lng;
+                document.getElementById('coords-text').innerText = `تم تحديد الإحداثيات بدقة: (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+
+                if (marker) {
+                    marker.setLatLng(e.latlng);
+                } else {
+                    marker = L.marker(e.latlng).addTo(map);
+                }
+            });
+        }
+
+        window.onload = function() {
+            initMap();
+        };
 
         function switchPage(pageId) {
             const pages = document.querySelectorAll('.page-view');
             pages.forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             window.scrollTo(0, 0);
+            if(pageId === 'add-ad' && map) {
+                setTimeout(() => { map.invalidateSize(); }, 200);
+            }
         }
 
         function handleAccountClick() {
@@ -683,6 +807,7 @@
                 profilePicPreview.src = registerPicPreview.src;
                 profilePicPreview.style.display = 'block';
             }
+            renderUserAds();
         }
 
         function loadRegisterPic(event) {
@@ -697,6 +822,190 @@
                 }
                 reader.readAsDataURL(file);
             }
+        }
+
+        // إضافة إعلان جديد (يبقى محفوظاً حتى يتم حذفه يدويًا)
+        function addNewAd(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('ad-title-input').value;
+            const description = document.getElementById('ad-desc-input').value;
+            const purpose = document.getElementById('ad-purpose-input').value; // sale or rent
+            const type = document.getElementById('ad-type-input').value;       // villa, apartment, etc.
+            const price = parseFloat(document.getElementById('ad-price-input').value);
+            const city = document.getElementById('ad-city-input').value;
+            const lat = document.getElementById('ad-lat').value;
+            const lng = document.getElementById('ad-lng').value;
+
+            const newAd = {
+                id: 'ad_' + Date.now(),
+                title: title,
+                description: description,
+                purpose: purpose,
+                type: type,
+                price: price,
+                city: city,
+                lat: lat,
+                lng: lng,
+                views: Math.floor(Math.random() * 50) + 1,
+                date: new Date().toLocaleDateString('ar-QA')
+            };
+
+            allAds.unshift(newAd);
+            renderAllAds();
+            alert('تم نشر الإعلان بنجاح وهو محفوظ الآن في النظام!');
+            
+            // إعادة ضبط النموذج
+            event.target.reset();
+            if(marker) { map.removeLayer(marker); marker = null; }
+            document.getElementById('coords-text').innerText = "اضغط على الخريطة لتحديد موقع العقار بدقة";
+            switchPage('home');
+        }
+
+        // حذف الإعلان نهائياً من النظام
+        function deleteAd(adId) {
+            if (confirm('هل أنت متأكد من حذف هذا الإعلان نهائياً؟')) {
+                allAds = allAds.filter(ad => ad.id !== adId);
+                favorites = favorites.filter(fav => fav.id !== adId);
+                renderAllAds();
+                updateFavoritesView();
+                renderUserAds();
+                alert('تم حذف الإعلان بنجاح.');
+            }
+        }
+
+        function renderAllAds() {
+            const mainContainer = document.getElementById('main-ads-grid');
+            const rentContainer = document.getElementById('rent-ads-grid');
+            const saleContainer = document.getElementById('sale-ads-grid');
+
+            if (allAds.length === 0) {
+                const emptyMsg = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات منشورة حالياً.</div>';
+                mainContainer.innerHTML = emptyMsg;
+                rentContainer.innerHTML = emptyMsg;
+                saleContainer.innerHTML = emptyMsg;
+                return;
+            }
+
+            let mainHtml = '';
+            let rentHtml = '';
+            let saleHtml = '';
+
+            allAds.forEach(ad => {
+                const isFav = favorites.some(f => f.id === ad.id);
+                const cardHtml = `
+                    <div class="ad-card" data-type="${ad.type}" data-city="${ad.city}" data-price="${ad.price}">
+                        <div class="ad-img">
+                            صورة العقار (${ad.city})
+                            <button class="fav-btn" style="color: ${isFav ? 'var(--gold)' : 'inherit'};" onclick="toggleFavorite('${ad.id}')">♥</button>
+                        </div>
+                        <div class="ad-content">
+                            <div class="ad-title">${ad.title}</div>
+                            <div class="ad-details">${ad.description.substring(0, 70)}...</div>
+                            <div style="font-size: 12px; color: var(--gold-light); margin-bottom: 10px;">المنطقة: ${ad.city} ${ad.lat ? '| تم تحديد الموقع على الخريطة' : ''}</div>
+                            <div class="ad-footer">
+                                <span>${ad.price.toLocaleString()} ر.ق</span>
+                                <span class="views-badge">مشاهدات: ${ad.views}</span>
+                            </div>
+                            <button class="btn-delete-ad" onclick="deleteAd('${ad.id}')">حذف الإعلان</button>
+                        </div>
+                    </div>
+                `;
+
+                mainHtml += cardHtml;
+                if (ad.purpose === 'rent') rentHtml += cardHtml;
+                if (ad.purpose === 'sale') saleHtml += cardHtml;
+            });
+
+            mainContainer.innerHTML = mainHtml;
+            rentContainer.innerHTML = rentHtml || '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات إيجار حالياً.</div>';
+            saleContainer.innerHTML = saleHtml || '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات بيع حالياً.</div>';
+
+            renderUserAds();
+        }
+
+        function renderUserAds() {
+            const userAdsList = document.getElementById('user-ads-list');
+            if(!userAdsList) return;
+
+            const myAds = allAds; // افتراض إعلانات المستخدم الحالي
+            if(myAds.length === 0) {
+                userAdsList.innerHTML = '<p style="color: var(--text-muted);">لا توجد إعلانات مضافة حالياً.</p>';
+                return;
+            }
+
+            userAdsList.innerHTML = myAds.map(ad => `
+                <div style="background: #111; padding: 12px; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="color: var(--gold);">${ad.title}</strong>
+                        <div style="font-size: 12px; color: var(--text-muted);">${ad.city} - ${ad.price.toLocaleString()} ر.ق</div>
+                    </div>
+                    <button class="btn-delete-ad" onclick="deleteAd('${ad.id}')">حذف</button>
+                </div>
+            `).join('');
+        }
+
+        function toggleFavorite(adId) {
+            const ad = allAds.find(a => a.id === adId);
+            if(!ad) return;
+
+            const index = favorites.findIndex(f => f.id === adId);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                alert('تمت الإزالة من المفضلة');
+            } else {
+                favorites.push(ad);
+                alert('تمت الإضافة إلى المفضلة');
+            }
+            renderAllAds();
+            updateFavoritesView();
+        }
+
+        function updateFavoritesView() {
+            const container = document.getElementById('fav-container');
+            if (favorites.length === 0) {
+                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لم تقم بإضافة أي عقارات للمفضلة حتى الآن.</div>';
+                return;
+            }
+            container.innerHTML = favorites.map(ad => `
+                <div class="ad-card">
+                    <div class="ad-img">
+                        صورة العقار
+                        <button class="fav-btn" style="color: var(--gold);" onclick="toggleFavorite('${ad.id}')">♥</button>
+                    </div>
+                    <div class="ad-content">
+                        <div class="ad-title">${ad.title}</div>
+                        <div class="ad-details">${ad.description}</div>
+                        <div class="ad-footer">
+                            <span>${ad.price.toLocaleString()} ر.ق</span>
+                            <span class="views-badge">${ad.views}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function applyFilters() {
+            const selectedType = document.getElementById('filter-type').value;
+            const selectedCity = document.getElementById('filter-city').value;
+            const maxPrice = parseFloat(document.getElementById('filter-max-price').value) || Infinity;
+
+            const cards = document.querySelectorAll('#main-ads-grid .ad-card');
+            cards.forEach(card => {
+                const type = card.getAttribute('data-type');
+                const city = card.getAttribute('data-city');
+                const price = parseFloat(card.getAttribute('data-price'));
+
+                let matchType = !selectedType || type === selectedType;
+                let matchCity = !selectedCity || city === selectedCity;
+                let matchPrice = price <= maxPrice;
+
+                if (matchType && matchCity && matchPrice) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         function calculate() {
@@ -728,63 +1037,6 @@
             } else {
                 document.getElementById('rent-result').innerText = 'إجمالي الإيجار السنوي (12 شهر): 0 ر.ق';
             }
-        }
-
-        let favorites = [];
-
-        function updateFavoritesView() {
-            const container = document.getElementById('fav-container');
-            if (favorites.length === 0) {
-                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لم تقم بإضافة أي عقارات للمفضلة حتى الآن.</div>';
-            } else {
-                container.innerHTML = favorites.map(fav => `
-                    <div class="ad-card">
-                        <div class="ad-img">
-                            صورة العقار
-                            <button class="fav-btn" style="color: var(--gold);" onclick="removeFavorite('${fav.id}')">♥</button>
-                        </div>
-                        <div class="ad-content">
-                            <div class="ad-title">${fav.title}</div>
-                            <div class="ad-details">${fav.details}</div>
-                            <div class="ad-footer">
-                                <span>${fav.priceText}</span>
-                                <span class="views-badge">${fav.views}</span>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function removeFavorite(id) {
-            favorites = favorites.filter(fav => fav.id !== id);
-            updateFavoritesView();
-            alert('تمت الإزالة من المفضلة');
-        }
-
-        updateFavoritesView();
-
-        function applyFilters() {
-            const selectedType = document.getElementById('filter-type').value;
-            const selectedCity = document.getElementById('filter-city').value;
-            const maxPrice = parseFloat(document.getElementById('filter-max-price').value) || Infinity;
-
-            const cards = document.querySelectorAll('#main-ads-grid .ad-card');
-            cards.forEach(card => {
-                const type = card.getAttribute('data-type');
-                const city = card.getAttribute('data-city');
-                const price = parseFloat(card.getAttribute('data-price'));
-
-                let matchType = !selectedType || type === selectedType;
-                let matchCity = !selectedCity || city === selectedCity;
-                let matchPrice = price <= maxPrice;
-
-                if (matchType && matchCity && matchPrice) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
         }
 
         async function fetchNews() {
