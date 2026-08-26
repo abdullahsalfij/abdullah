@@ -28,7 +28,7 @@
             border-bottom: 2px solid var(--gold);
             padding: 15px 40px;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
             position: relative;
         }
@@ -37,6 +37,9 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            /* الشعار مثبت في أعلى اليمين ولا يمكن للزائر تعديله */
+            position: absolute;
+            right: 40px;
         }
 
         .logo-img {
@@ -47,7 +50,6 @@
             border: 1px solid var(--gold-dark);
             background: #000;
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
-            cursor: pointer;
         }
 
         .logo-text-group {
@@ -373,9 +375,9 @@
 <body>
 
     <header>
+        <!-- الشعار مثبت في أعلى اليمين ولا يمكن للزوار تعديله -->
         <div class="logo-container">
-            <img src="" alt="شعار المواثيق العقارية" class="logo-img" id="brand-logo" onclick="document.getElementById('brand-logo-input').click()" title="انقر لتغيير الشعار">
-            <input type="file" id="brand-logo-input" accept="image/*" style="display: none;" onchange="loadBrandLogo(event)">
+            <img src="" alt="شعار المواثيق العقارية" class="logo-img" id="brand-logo">
             <div class="logo-text-group">
                 <div class="logo">المواثيق العقارية</div>
                 <div class="logo-sub">ALMAWATHIQ REAL ESTATE</div>
@@ -402,7 +404,7 @@
                 <p>مرحباً بك في المواثيق العقارية. نحن نبتكر أفضل الحلول العقارية ونوفر منصة متكاملة لعرض وطلب العقارات بأعلى معايير الجودة والفخامة في دولة قطر.</p>
             </div>
 
-            <!-- البحث المتقدم (أول شيء بعد عن الشركة) -->
+            <!-- البحث المتقدم -->
             <div class="section-title">البحث المتقدم</div>
             <div class="filter-section">
                 <div class="filter-grid">
@@ -616,17 +618,6 @@
     <script>
         let isLoggedIn = false;
         let currentUser = { name: "عبدالله", phone: "+97433293328", pic: "" };
-
-        function loadBrandLogo(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('brand-logo').src = e.target.result;
-                }
-                reader.readAsDataURL(file);
-            }
-        }
 
         function switchPage(pageId) {
             const pages = document.querySelectorAll('.page-view');
