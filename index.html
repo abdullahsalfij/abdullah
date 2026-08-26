@@ -723,19 +723,22 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyD...", 
-            authDomain: "abdullah-14d5c.firebaseapp.com",
-            projectId: "abdullah-14d5c",
-            storageBucket: "abdullah-14d5c.appspot.com",
-            messagingSenderId: "463646549767",
-            appId: "1:463646549767:web:68dfac3533e5ff6y081f0y"
+            apiKey: "AIzaSyDmtFl-ozeXhUq4WPQHIXQ7ydOCo1hEeQA",
+            authDomain: "abdullah-1d45c.firebaseapp.com",
+            projectId: "abdullah-1d45c",
+            storageBucket: "abdullah-1d45c.firebasestorage.app",
+            messagingSenderId: "467402407857",
+            appId: "1:467402407857:web:3d0e662942f3ff78de0790",
+            measurementId: "G-98MHR2EDQ6"
         };
 
         const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
         let map, marker, fullMap, fullMarker;
