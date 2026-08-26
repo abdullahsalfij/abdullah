@@ -1218,3 +1218,111 @@
         }
     </script>
 </body>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المواثيق العقارية</title>
+    <style>
+        body { background-color: #0b0b0b; color: #fff; font-family: Tahoma, sans-serif; padding: 20px; }
+        .card { background: #141414; border: 1px solid #d4af37; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+        input, textarea, button { display: block; width: 100%; margin: 10px 0; padding: 10px; background: #222; color: #fff; border: 1px solid #444; border-radius: 5px; }
+        button { background: #d4af37; color: #000; font-weight: bold; cursor: pointer; }
+        .gold { color: #d4af37; }
+    </style>
+</head>
+<body>
+
+    <h1 class="gold" style="text-align: center;">المواثيق العقارية</h1>
+
+    <!-- نموذج إضافة إعلان -->
+    <div class="card">
+        <h3>إضافة إعلان جديد</h3>
+        <input type="text" id="title" placeholder="عنوان العقار (مثال: فيلا للبيع)">
+        <textarea id="description" placeholder="تفاصيل العقار"></textarea>
+        <input type="number" id="price" placeholder="السعر (ر.ق)">
+        <button onclick="addAd()">نشر الإعلان في قاعدة البيانات</button>
+    </div>
+
+    <!-- عرض الإعلانات -->
+    <h3 class="gold">الإعلانات المتوفرة:</h3>
+    <div id="ads-container">جاري تحميل الإعلانات...</div>
+
+    <!-- سكربت Firebase للاتصال بقاعدة البيانات -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD...", 
+            authDomain: "abdullah-14d5c.firebaseapp.com",
+            projectId: "abdullah-14d5c",
+            storageBucket: "abdullah-14d5c.appspot.com",
+            messagingSenderId: "463646549767",
+            appId: "1:463646549767:web:68dfac3533e5ff6y081f0y"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // دالة جلب وعرض الإعلانات من مجموعة abdullah
+        async function loadAds() {
+            const container = document.getElementById('ads-container');
+            try {
+                const querySnapshot = await getDocs(collection(db, "abdullah"));
+                if (querySnapshot.empty) {
+                    container.innerHTML = "<p>لا توجد إعلانات حالياً.</p>";
+                    return;
+                }
+                container.innerHTML = "";
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    container.innerHTML += `
+                        <div class="card">
+                            <h4 class="gold">${data.title || 'بدون عنوان'}</h4>
+                            <p>${data.description || ''}</p>
+                            <p class="gold">السعر: ${data.price ? data.price.toLocaleString() : 0} ر.ق</p>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("خطأ في الجلب:", error);
+                container.innerHTML = "<p style='color:red;'>حدث خطأ أثناء جلب الإعلانات.</p>";
+            }
+        }
+
+        // دالة إضافة إعلان جديد
+        window.addAd = async function() {
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const price = document.getElementById('price').value;
+
+            if(!title || !price) {
+                alert('الرجاء إدخال عنوان الإعلان والسعر على الأقل!');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "abdullah"), {
+                    title: title,
+                    description: description,
+                    price: Number(price),
+                    date: new Date().toLocaleDateString('ar-QA')
+                });
+                alert('تم نشر الإعلان بنجاح!');
+                document.getElementById('title').value = '';
+                document.getElementById('description').value = '';
+                document.getElementById('price').value = '';
+                loadAds();
+            } catch (error) {
+                console.error("خطأ في الإضافة:", error);
+                alert('فشل حفظ الإعلان.');
+            }
+        }
+
+        // تشغيل الجلب عند تحميل الصفحة
+        loadAds();
+    </script>
+</body>
+</html>
