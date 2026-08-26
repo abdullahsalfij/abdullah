@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المواثيق العقارية</title>
-    <!-- مكتبة Leaflet للخرائط التفاعلية -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
@@ -143,7 +142,7 @@
             font-size: 22px;
         }
 
-        .about-section, .stats-section, .calc-section, .filter-section, .auth-box, .ad-form, .profile-box {
+        .about-section, .stats-section, .calc-section, .filter-section, .auth-box, .ad-form, .profile-box, .ad-full-page {
             background-color: var(--card-bg);
             border: 1px solid var(--gold-dark);
             padding: 30px;
@@ -209,6 +208,7 @@
             overflow: hidden;
             transition: 0.3s;
             position: relative;
+            cursor: pointer;
         }
 
         .ad-card:hover {
@@ -225,6 +225,13 @@
             justify-content: center;
             color: var(--text-muted);
             position: relative;
+            overflow: hidden;
+        }
+
+        .ad-img img, .ad-img video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .fav-btn {
@@ -239,6 +246,7 @@
             border-radius: 50%;
             cursor: pointer;
             transition: 0.3s;
+            z-index: 10;
         }
 
         .fav-btn:hover {
@@ -254,6 +262,7 @@
             color: var(--gold);
             font-size: 18px;
             margin-bottom: 10px;
+            font-weight: bold;
         }
 
         .ad-details {
@@ -305,6 +314,7 @@
             border: 1px solid #444;
             border-radius: 5px;
             margin: 15px 0;
+            z-index: 1;
         }
 
         .coordinates-info {
@@ -380,6 +390,32 @@
             background-color: #c9302c;
         }
 
+        /* تنسيق صفحة تفاصيل الإعلان */
+        .ad-full-page {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .media-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .media-item {
+            height: 250px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+
+        .media-item img, .media-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         footer {
             text-align: center;
             padding: 30px;
@@ -434,7 +470,6 @@
                 <p>مرحباً بك في المواثيق العقارية. نحن نبتكر أفضل الحلول العقارية ونوفر منصة متكاملة لعرض وطلب العقارات بأعلى معايير الجودة والفخامة في دولة قطر.</p>
             </div>
 
-            <!-- البحث المتقدم (يشمل جميع بلديات قطر) -->
             <div class="section-title">البحث المتقدم</div>
             <div class="filter-section">
                 <div class="filter-grid">
@@ -472,13 +507,11 @@
                 </div>
             </div>
 
-            <!-- الإعلانات المنشورة -->
             <div class="section-title">الإعلانات العقارية المتوفرة</div>
             <div class="ads-grid" id="main-ads-grid">
                 <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لا توجد إعلانات منشورة حالياً. أضف إعلانك الأول!</div>
             </div>
 
-            <!-- متوسط أسعار العقارات في قطر -->
             <div class="section-title">متوسط أسعار العقارات في قطر</div>
             <div class="stats-section">
                 <div class="stats-grid">
@@ -501,7 +534,6 @@
                 </div>
             </div>
 
-            <!-- حاسبة التمويل العقاري -->
             <div class="section-title">حاسبة التمويل العقاري</div>
             <div class="calc-section">
                 <div class="calc-form">
@@ -521,7 +553,6 @@
                 <div class="calc-result" id="result">القسط الشهري التقديري: 0 ر.ق</div>
             </div>
 
-            <!-- حاسبة الإيجار -->
             <div class="section-title">حاسبة الإيجار السنوي</div>
             <div class="calc-section">
                 <div class="calc-form">
@@ -625,11 +656,11 @@
             <div id="news-grid">جاري تحميل الأخبار...</div>
         </div>
 
-        <!-- صفحة إضافة إعلان (مع الخريطة التفاعلية وقائمة مناطق قطر الكاملة) -->
+        <!-- صفحة إضافة إعلان -->
         <div id="add-ad" class="page-view">
             <div class="section-title">إضافة إعلان جديد</div>
             <div class="ad-form" style="max-width: 800px; margin: 0 auto;">
-                <form onsubmit="addNewAd(event)">
+                <form id="adForm" onsubmit="addNewAd(event)">
                     <input type="text" id="ad-title-input" placeholder="عنوان الإعلان" required>
                     <textarea id="ad-desc-input" placeholder="وصف العقار" rows="4" required></textarea>
                     
@@ -650,13 +681,12 @@
 
                     <input type="number" id="ad-price-input" placeholder="السعر (ر.ق)" required>
                     
-                    <!-- قائمة منسدلة تشمل جميع مناطق وبلديات قطر -->
                     <select id="ad-city-input" required>
                         <option value="" disabled selected>اختر المنطقة أو البلدية</option>
                         <option value="الدوحة">الدوحة</option>
                         <option value="الريان">الريان</option>
                         <option value="الوكرة">الوكرة</option>
-                        <option value="الخور">الخور والذخيرة</option>
+                        <option value="الخور">الخور والذكيرة</option>
                         <option value="الضعاين">الضعاين</option>
                         <option value="الشمال">الشمال</option>
                         <option value="الشيحانية">الشيحانية</option>
@@ -673,67 +703,94 @@
                         <option value="أبو هامور">أبو هامور</option>
                     </select>
 
-                    <!-- الخريطة التفاعلية لتحديد الموقع بدقة -->
                     <div style="margin-top: 20px;">
                         <label style="color: var(--gold); font-weight: bold; display: block; margin-bottom: 5px;">حدد الموقع بدقة على خريطة قطر:</label>
-                        <div class="coordinates-info" id="coords-text">اضغط على الخريطة لتحديد موقع العقار بدقة</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                            <div class="coordinates-info" id="coords-text" style="margin-bottom: 0;">اضغط على الخريطة لتحديد موقع العقار بدقة</div>
+                            <button type="button" class="btn-outline" style="padding: 5px 12px; font-size: 13px;" onclick="locateUserPosition()">📍 تحديد موقعي تلقائياً</button>
+                        </div>
                         <div id="map"></div>
                         <input type="hidden" id="ad-lat">
                         <input type="hidden" id="ad-lng">
                     </div>
                     
                     <div style="color: var(--text-color); margin-top: 15px; font-weight: bold;">رفع الصور (بحد أقصى 10 صور):</div>
-                    <input type="file" accept="image/*" multiple>
+                    <input type="file" id="ad-images-input" accept="image/*" multiple>
                     
                     <div style="color: var(--text-color); margin-top: 15px; font-weight: bold;">رفع الفيديوهات (بحد أقصى 3 فيديوهات):</div>
-                    <input type="file" accept="video/*" multiple>
+                    <input type="file" id="ad-videos-input" accept="video/*" multiple>
                     
                     <button type="submit" class="btn-gold" style="width: 100%; margin-top: 20px;">نشر الإعلان</button>
                 </form>
             </div>
         </div>
-    </div>
 
-    <footer>
-        <div class="social-links">
-            <a href="https://wa.me/97433293328" target="_blank">تواصل معنا عبر واتساب</a>
-            <a href="https://www.instagram.com/abds_31/" target="_blank">تابعنا على إنستقرام</a>
+        <!-- صفحة عرض الإعلان بالكامل (ستظهر عند الضغط على أي إعلان) -->
+        <div id="ad-details-page" class="page-view">
+            <button class="btn-outline" onclick="switchPage('home')">← العودة للرئيسية</button>
+            <div class="ad-full-page">
+                <h2 id="full-ad-title" style="color: var(--gold); margin-bottom: 10px;"></h2>
+                <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px;" id="full-ad-meta"></div>
+                
+                <div class="media-gallery" id="full-ad-media"></div>
+
+                <div style="font-size: 18px; color: var(--text-color); margin-bottom: 20px;" id="full-ad-desc"></div>
+                
+                <div class="ad-footer">
+                    <span id="full-ad-price" style="font-size: 24px; color: var(--gold);"></span>
+                    <span class="views-badge" id="full-ad-views"></span>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <label style="color: var(--gold); font-weight: bold; display: block; margin-bottom: 5px;">موقع العقار على الخريطة:</label>
+                    <div id="full-ad-map" style="height: 300px; width: 100%; border: 1px solid #444; border-radius: 5px;"></div>
+                </div>
+            </div>
         </div>
-        <p style="margin-top: 10px; font-size: 13px; color: var(--gold-light);">س.ت: 174023 &bull; C.R.No: 174023</p>
-        <p style="margin-top: 10px;">جميع الحقوق محفوظة &copy; 2026 - المواثيق العقارية</p>
-    </footer>
-
-    <!-- سكربت خريطة Leaflet -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        let isLoggedIn = false;
-        let currentUser = { name: "عبدالله", phone: "+97433293328", pic: "" };
+    </div>
+    let map, marker, fullMap;
         let allAds = [];
         let favorites = [];
 
-        // تهيئة الخريطة التفاعلية عند تحميل الصفحة
-        let map, marker;
         function initMap() {
-            // مركز الخريطة الافتراضي على قطر (الدوحة/الريان)
             map = L.map('map').setView([25.2854, 51.5310], 11);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
 
             map.on('click', function(e) {
-                let lat = e.latlng.lat;
-                let lng = e.latlng.lng;
-                
-                document.getElementById('ad-lat').value = lat;
-                document.getElementById('ad-lng').value = lng;
-                document.getElementById('coords-text').innerText = `تم تحديد الإحداثيات بدقة: (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-
-                if (marker) {
-                    marker.setLatLng(e.latlng);
-                } else {
-                    marker = L.marker(e.latlng).addTo(map);
-                }
+                setMarkerPosition(e.latlng.lat, e.latlng.lng);
             });
+        }
+
+        function setMarkerPosition(lat, lng) {
+            document.getElementById('ad-lat').value = lat;
+            document.getElementById('ad-lng').value = lng;
+            document.getElementById('coords-text').innerText = `تم تحديد الإحداثيات بدقة: (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+
+            const latLng = [lat, lng];
+            if (marker) {
+                marker.setLatLng(latLng);
+            } else {
+                marker = L.marker(latLng).addTo(map);
+            }
+            map.setView(latLng, 14);
+        }
+
+        function locateUserPosition() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        setMarkerPosition(position.coords.latitude, position.coords.longitude);
+                    },
+                    () => {
+                        alert('تعذر تحديد الموقع. يرجى الضغط يدوياً على الخريطة.');
+                    },
+                    { enableHighAccuracy: true }
+                );
+            } else {
+                alert('المتصفح لا يدعم تحديد الموقع.');
+            }
         }
 
         window.onload = function() {
@@ -741,73 +798,47 @@
         };
 
         function switchPage(pageId) {
-            const pages = document.querySelectorAll('.page-view');
-            pages.forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             window.scrollTo(0, 0);
-            if(pageId === 'add-ad' && map) {
-                setTimeout(() => { map.invalidateSize(); }, 200);
-            }
+            if(pageId === 'add-ad' && map) map.invalidateSize();
+            if(pageId === 'home') renderAllAds();
         }
 
         function handleAccountClick() {
-            if (isLoggedIn) {
-                switchPage('profile');
-            } else {
-                switchPage('auth');
-            }
+            isLoggedIn ? switchPage('profile') : switchPage('auth');
         }
 
         function loginUser(event) {
             event.preventDefault();
-            const phoneInput = document.getElementById('login-phone').value;
-            currentUser.phone = phoneInput;
+            currentUser.phone = document.getElementById('login-phone').value;
             currentUser.name = "مستخدم الجوال";
-            
             isLoggedIn = true;
             document.getElementById('account-btn').innerText = "الملف التعريفي";
             updateProfileView();
             switchPage('profile');
-            alert('تم تسجيل الدخول بنجاح!');
         }
 
         function registerUser(event) {
             event.preventDefault();
-            const nameInput = document.getElementById('reg-name').value;
-            const phoneInput = document.getElementById('reg-phone').value;
-            currentUser.name = nameInput;
-            currentUser.phone = phoneInput;
-
+            currentUser.name = document.getElementById('reg-name').value;
+            currentUser.phone = document.getElementById('reg-phone').value;
             isLoggedIn = true;
             document.getElementById('account-btn').innerText = "الملف التعريفي";
             updateProfileView();
             switchPage('profile');
-            alert('تم إنشاء الحساب وتسجيل الدخول بنجاح!');
         }
 
         function logoutUser() {
             isLoggedIn = false;
             document.getElementById('account-btn').innerText = "تسجيل الدخول";
-            document.getElementById('register-img-preview').style.display = 'none';
-            document.getElementById('upload-text').style.display = 'flex';
-            document.getElementById('register-pic-input').value = '';
-            
             switchPage('home');
-            alert('تم تسجيل الخروج بنجاح');
         }
 
         function updateProfileView() {
             document.getElementById('profile-name').innerText = currentUser.name;
             document.getElementById('profile-phone').innerText = currentUser.phone;
-            
-            const profilePicPreview = document.getElementById('profile-img-preview');
-            const registerPicPreview = document.getElementById('register-img-preview');
-            
-            if (registerPicPreview.src && registerPicPreview.src !== window.location.href) {
-                profilePicPreview.src = registerPicPreview.src;
-                profilePicPreview.style.display = 'block';
-            }
-            renderUserAds();
+            renderAllAds();
         }
 
         function loadRegisterPic(event) {
@@ -815,62 +846,58 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const imgPreview = document.getElementById('register-img-preview');
-                    imgPreview.src = e.target.result;
-                    imgPreview.style.display = 'block';
+                    const img = document.getElementById('register-img-preview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
                     document.getElementById('upload-text').style.display = 'none';
+                    document.getElementById('profile-img-preview').src = e.target.result;
+                    document.getElementById('profile-img-preview').style.display = 'block';
                 }
                 reader.readAsDataURL(file);
             }
         }
 
-        // إضافة إعلان جديد (يبقى محفوظاً حتى يتم حذفه يدويًا)
         function addNewAd(event) {
             event.preventDefault();
-            
-            const title = document.getElementById('ad-title-input').value;
-            const description = document.getElementById('ad-desc-input').value;
-            const purpose = document.getElementById('ad-purpose-input').value; // sale or rent
-            const type = document.getElementById('ad-type-input').value;       // villa, apartment, etc.
-            const price = parseFloat(document.getElementById('ad-price-input').value);
-            const city = document.getElementById('ad-city-input').value;
-            const lat = document.getElementById('ad-lat').value;
-            const lng = document.getElementById('ad-lng').value;
+
+            const imageFiles = document.getElementById('ad-images-input').files;
+            const videoFiles = document.getElementById('ad-videos-input').files;
+
+            const images = Array.from(imageFiles).map(file => URL.createObjectURL(file));
+            const videos = Array.from(videoFiles).map(file => URL.createObjectURL(file));
 
             const newAd = {
                 id: 'ad_' + Date.now(),
-                title: title,
-                description: description,
-                purpose: purpose,
-                type: type,
-                price: price,
-                city: city,
-                lat: lat,
-                lng: lng,
-                views: Math.floor(Math.random() * 50) + 1,
+                title: document.getElementById('ad-title-input').value,
+                description: document.getElementById('ad-desc-input').value,
+                purpose: document.getElementById('ad-purpose-input').value,
+                type: document.getElementById('ad-type-input').value,
+                price: parseFloat(document.getElementById('ad-price-input').value),
+                city: document.getElementById('ad-city-input').value,
+                lat: document.getElementById('ad-lat').value,
+                lng: document.getElementById('ad-lng').value,
+                images: images,
+                videos: videos,
+                views: 0,
                 date: new Date().toLocaleDateString('ar-QA')
             };
 
             allAds.unshift(newAd);
-            renderAllAds();
-            alert('تم نشر الإعلان بنجاح وهو محفوظ الآن في النظام!');
-            
-            // إعادة ضبط النموذج
+            alert('تم نشر الإعلان بنجاح!');
             event.target.reset();
             if(marker) { map.removeLayer(marker); marker = null; }
             document.getElementById('coords-text').innerText = "اضغط على الخريطة لتحديد موقع العقار بدقة";
             switchPage('home');
         }
 
-        // حذف الإعلان نهائياً من النظام
-        function deleteAd(adId) {
-            if (confirm('هل أنت متأكد من حذف هذا الإعلان نهائياً؟')) {
-                allAds = allAds.filter(ad => ad.id !== adId);
-                favorites = favorites.filter(fav => fav.id !== adId);
+        function deleteAd(id, event) {
+            if(event) event.stopPropagation();
+            if (confirm('هل أنت متأكد من حذف هذا الإعلان؟')) {
+                allAds = allAds.filter(ad => ad.id !== id);
+                favorites = favorites.filter(fav => fav.id !== id);
                 renderAllAds();
                 updateFavoritesView();
                 renderUserAds();
-                alert('تم حذف الإعلان بنجاح.');
             }
         }
 
@@ -887,27 +914,27 @@
                 return;
             }
 
-            let mainHtml = '';
-            let rentHtml = '';
-            let saleHtml = '';
+            let mainHtml = '', rentHtml = '', saleHtml = '';
 
             allAds.forEach(ad => {
                 const isFav = favorites.some(f => f.id === ad.id);
+                const mediaHtml = ad.images.length > 0 ? 
+                    `<img src="${ad.images[0]}" alt="${ad.title}">` : 
+                    (ad.videos.length > 0 ? `<video src="${ad.videos[0]}"></video>` : 'لا توجد صور');
+
                 const cardHtml = `
-                    <div class="ad-card" data-type="${ad.type}" data-city="${ad.city}" data-price="${ad.price}">
-                        <div class="ad-img">
-                            صورة العقار (${ad.city})
-                            <button class="fav-btn" style="color: ${isFav ? 'var(--gold)' : 'inherit'};" onclick="toggleFavorite('${ad.id}')">♥</button>
-                        </div>
+                    <div class="ad-card" data-type="${ad.type}" data-city="${ad.city}" data-price="${ad.price}" onclick="viewAdDetails('${ad.id}')">
+                        <button class="fav-btn" style="color: ${isFav ? 'var(--gold)' : 'inherit'};" onclick="toggleFavorite('${ad.id}', event)">♥</button>
+                        <div class="ad-img">${mediaHtml}</div>
                         <div class="ad-content">
                             <div class="ad-title">${ad.title}</div>
-                            <div class="ad-details">${ad.description.substring(0, 70)}...</div>
-                            <div style="font-size: 12px; color: var(--gold-light); margin-bottom: 10px;">المنطقة: ${ad.city} ${ad.lat ? '| تم تحديد الموقع على الخريطة' : ''}</div>
+                            <div class="ad-details">${ad.description.substring(0, 50)}...</div>
+                            <div style="font-size: 12px; color: var(--gold-light); margin-bottom: 10px;">المنطقة: ${ad.city}</div>
                             <div class="ad-footer">
                                 <span>${ad.price.toLocaleString()} ر.ق</span>
-                                <span class="views-badge">مشاهدات: ${ad.views}</span>
+                                <span class="views-badge">المشاهدات: ${ad.views}</span>
                             </div>
-                            <button class="btn-delete-ad" onclick="deleteAd('${ad.id}')">حذف الإعلان</button>
+                            <button class="btn-delete-ad" onclick="deleteAd('${ad.id}', event)">حذف الإعلان</button>
                         </div>
                     </div>
                 `;
@@ -925,64 +952,81 @@
         }
 
         function renderUserAds() {
-            const userAdsList = document.getElementById('user-ads-list');
-            if(!userAdsList) return;
-
-            const myAds = allAds; // افتراض إعلانات المستخدم الحالي
-            if(myAds.length === 0) {
-                userAdsList.innerHTML = '<p style="color: var(--text-muted);">لا توجد إعلانات مضافة حالياً.</p>';
-                return;
-            }
-
-            userAdsList.innerHTML = myAds.map(ad => `
-                <div style="background: #111; padding: 12px; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong style="color: var(--gold);">${ad.title}</strong>
-                        <div style="font-size: 12px; color: var(--text-muted);">${ad.city} - ${ad.price.toLocaleString()} ر.ق</div>
+            const list = document.getElementById('user-ads-list');
+            list.innerHTML = allAds.length === 0 ? '<p style="color: var(--text-muted);">لا توجد إعلانات مضافة حالياً.</p>' :
+                allAds.map(ad => `
+                    <div style="background: #111; padding: 12px; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="color: var(--gold);">${ad.title}</strong>
+                            <div style="font-size: 12px; color: var(--text-muted);">${ad.city} - ${ad.price.toLocaleString()} ر.ق</div>
+                        </div>
+                        <button class="btn-delete-ad" onclick="deleteAd('${ad.id}', event)">حذف</button>
                     </div>
-                    <button class="btn-delete-ad" onclick="deleteAd('${ad.id}')">حذف</button>
-                </div>
-            `).join('');
+                `).join('');
         }
 
-        function toggleFavorite(adId) {
+        function toggleFavorite(adId, event) {
+            event.stopPropagation();
             const ad = allAds.find(a => a.id === adId);
-            if(!ad) return;
-
             const index = favorites.findIndex(f => f.id === adId);
-            if (index > -1) {
-                favorites.splice(index, 1);
-                alert('تمت الإزالة من المفضلة');
-            } else {
-                favorites.push(ad);
-                alert('تمت الإضافة إلى المفضلة');
-            }
+            index > -1 ? favorites.splice(index, 1) : favorites.push(ad);
             renderAllAds();
             updateFavoritesView();
         }
 
         function updateFavoritesView() {
             const container = document.getElementById('fav-container');
-            if (favorites.length === 0) {
-                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لم تقم بإضافة أي عقارات للمفضلة حتى الآن.</div>';
-                return;
-            }
-            container.innerHTML = favorites.map(ad => `
-                <div class="ad-card">
-                    <div class="ad-img">
-                        صورة العقار
-                        <button class="fav-btn" style="color: var(--gold);" onclick="toggleFavorite('${ad.id}')">♥</button>
-                    </div>
-                    <div class="ad-content">
-                        <div class="ad-title">${ad.title}</div>
-                        <div class="ad-details">${ad.description}</div>
-                        <div class="ad-footer">
-                            <span>${ad.price.toLocaleString()} ر.ق</span>
-                            <span class="views-badge">${ad.views}</span>
+            container.innerHTML = favorites.length === 0 ? '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 20px;">لم تقم بإضافة عقارات للمفضلة.</div>' :
+                favorites.map(ad => `
+                    <div class="ad-card" onclick="viewAdDetails('${ad.id}')">
+                        <button class="fav-btn" style="color: var(--gold);" onclick="toggleFavorite('${ad.id}', event)">♥</button>
+                        <div class="ad-img"><img src="${ad.images[0]}" alt="${ad.title}"></div>
+                        <div class="ad-content">
+                            <div class="ad-title">${ad.title}</div>
+                            <div class="ad-footer"><span>${ad.price.toLocaleString()} ر.ق</span></div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+        }
+
+        function viewAdDetails(adId) {
+            const ad = allAds.find(a => a.id === adId);
+            if (!ad) return;
+            
+            ad.views += 1;
+
+            document.getElementById('full-ad-title').innerText = ad.title;
+            document.getElementById('full-ad-meta').innerText = `المنطقة: ${ad.city} | النوع: ${ad.type} | التاريخ: ${ad.date}`;
+            document.getElementById('full-ad-desc').innerText = ad.description;
+            document.getElementById('full-ad-price').innerText = `${ad.price.toLocaleString()} ر.ق`;
+            document.getElementById('full-ad-views').innerText = `المشاهدات: ${ad.views}`;
+
+            const mediaContainer = document.getElementById('full-ad-media');
+            mediaContainer.innerHTML = '';
+            
+            ad.images.forEach(img => {
+                mediaContainer.innerHTML += `<div class="media-item"><img src="${img}" alt="صورة العقار"></div>`;
+            });
+            
+            ad.videos.forEach(vid => {
+                mediaContainer.innerHTML += `<div class="media-item"><video src="${vid}" controls></video></div>`;
+            });
+
+            switchPage('ad-details-page');
+
+            if (ad.lat && ad.lng) {
+                setTimeout(() => {
+                    if (!fullMap) {
+                        fullMap = L.map('full-ad-map').setView([parseFloat(ad.lat), parseFloat(ad.lng)], 14);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; OpenStreetMap contributors'
+                        }).addTo(fullMap);
+                    } else {
+                        fullMap.setView([parseFloat(ad.lat), parseFloat(ad.lng)], 14);
+                    }
+                    L.marker([parseFloat(ad.lat), parseFloat(ad.lng)]).addTo(fullMap);
+                }, 300);
+            }
         }
 
         function applyFilters() {
@@ -990,21 +1034,11 @@
             const selectedCity = document.getElementById('filter-city').value;
             const maxPrice = parseFloat(document.getElementById('filter-max-price').value) || Infinity;
 
-            const cards = document.querySelectorAll('#main-ads-grid .ad-card');
-            cards.forEach(card => {
+            document.querySelectorAll('#main-ads-grid .ad-card').forEach(card => {
                 const type = card.getAttribute('data-type');
                 const city = card.getAttribute('data-city');
                 const price = parseFloat(card.getAttribute('data-price'));
-
-                let matchType = !selectedType || type === selectedType;
-                let matchCity = !selectedCity || city === selectedCity;
-                let matchPrice = price <= maxPrice;
-
-                if (matchType && matchCity && matchPrice) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
+                card.style.display = (!selectedType || type === selectedType) && (!selectedCity || city === selectedCity) && price <= maxPrice ? 'block' : 'none';
             });
         }
 
@@ -1012,18 +1046,12 @@
             const price = parseFloat(document.getElementById('price').value);
             const downpayment = parseFloat(document.getElementById('downpayment').value);
             const years = parseFloat(document.getElementById('years').value);
-
             if (price > 0 && years > 0) {
                 const loanAmount = price - (downpayment || 0);
                 const monthlyInterestRate = (4 / 100) / 12;
                 const numberOfPayments = years * 12;
-                
-                if (numberOfPayments > 0 && monthlyInterestRate > 0) {
-                    const monthlyPayment = (loanAmount * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -numberOfPayments));
-                    document.getElementById('result').innerText = 'القسط الشهري التقديري: ' + Math.max(0, monthlyPayment).toFixed(0) + ' ر.ق';
-                } else {
-                    document.getElementById('result').innerText = 'القسط الشهري التقديري: 0 ر.ق';
-                }
+                const monthlyPayment = (loanAmount * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -numberOfPayments));
+                document.getElementById('result').innerText = 'القسط الشهري التقديري: ' + Math.max(0, monthlyPayment).toFixed(0) + ' ر.ق';
             } else {
                 document.getElementById('result').innerText = 'القسط الشهري التقديري: 0 ر.ق';
             }
@@ -1032,8 +1060,7 @@
         function calculateRent() {
             const monthlyRent = parseFloat(document.getElementById('monthly-rent').value);
             if (monthlyRent > 0) {
-                const annualRent = monthlyRent * 12;
-                document.getElementById('rent-result').innerText = 'إجمالي الإيجار السنوي (12 شهر): ' + annualRent.toFixed(0) + ' ر.ق';
+                document.getElementById('rent-result').innerText = 'إجمالي الإيجار السنوي (12 شهر): ' + (monthlyRent * 12).toFixed(0) + ' ر.ق';
             } else {
                 document.getElementById('rent-result').innerText = 'إجمالي الإيجار السنوي (12 شهر): 0 ر.ق';
             }
@@ -1042,46 +1069,28 @@
         async function fetchNews() {
             const apiKey = 'pub_0d694ce2a4d14bbba74ebffebefe8e6';
             const url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=عقارات قطر OR أسعار العقارات في قطر&language=ar`;
-            
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 const newsGrid = document.getElementById('news-grid');
-                
                 if (data.results && data.results.length > 0) {
                     const fourteenDaysAgo = new Date();
                     fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
-
-                    const filteredArticles = data.results.filter(article => {
-                        if (!article.pubDate) return false;
-                        const articleDate = new Date(article.pubDate);
-                        return articleDate >= fourteenDaysAgo;
-                    });
-
-                    if (filteredArticles.length > 0) {
-                        newsGrid.innerHTML = '';
-                        filteredArticles.forEach(article => {
-                            const newsItem = document.createElement('div');
-                            newsItem.className = 'news-item';
-                            newsItem.innerHTML = `
-                                <a href="${article.link}" target="_blank" class="news-title">${article.title}</a>
-                                <div class="news-desc">${article.description || 'لا توجد تفاصيل متاحة.'}</div>
-                                <div class="news-date">تاريخ النشر: ${article.pubDate}</div>
-                            `;
-                            newsGrid.appendChild(newsItem);
-                        });
-                    } else {
-                        newsGrid.innerHTML = 'لا توجد أخبار عقارية في قطر خلال الـ 14 يوماً الماضية.';
-                    }
+                    const filtered = data.results.filter(a => new Date(a.pubDate) >= fourteenDaysAgo);
+                    newsGrid.innerHTML = filtered.length > 0 ? filtered.map(article => `
+                        <div class="news-item">
+                            <a href="${article.link}" target="_blank" class="news-title">${article.title}</a>
+                            <div class="news-desc">${article.description || 'لا توجد تفاصيل.'}</div>
+                            <div class="news-date">تاريخ النشر: ${article.pubDate}</div>
+                        </div>
+                    `).join('') : 'لا توجد أخبار عقارية في قطر خلال الـ 14 يوماً الماضية.';
                 } else {
-                    newsGrid.innerHTML = 'لا توجد أخبار متاحة حالياً.';
+                    newsGrid.innerHTML = 'لا توجد أخبار.';
                 }
             } catch (error) {
-                console.error('Error fetching news:', error);
-                document.getElementById('news-grid').innerHTML = 'حدث خطأ أثناء تحميل الأخبار.';
+                document.getElementById('news-grid').innerHTML = 'حدث خطأ.';
             }
         }
-
         fetchNews();
         setInterval(fetchNews, 300000);
     </script>
