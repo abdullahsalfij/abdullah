@@ -855,14 +855,23 @@
             }
         }
 
-        function addNewAd(event) {
+        async function addNewAd(event) {
             event.preventDefault();
 
             const imageFiles = document.getElementById('ad-images-input').files;
             const videoFiles = document.getElementById('ad-videos-input').files;
 
-            const images = Array.from(imageFiles).map(file => URL.createObjectURL(file));
-            const videos = Array.from(videoFiles).map(file => URL.createObjectURL(file));
+            const images = [];
+            for (let file of imageFiles) {
+                const base64 = await toBase64(file);
+                images.push(base64);
+            }
+
+            const videos = [];
+            for (let file of videoFiles) {
+                const base64 = await toBase64(file);
+                videos.push(base64);
+            }
 
             const newAd = {
                 id: 'ad_' + Date.now(),
@@ -887,6 +896,15 @@
             if(marker) { map.removeLayer(marker); marker = null; }
             document.getElementById('coords-text').innerText = "اضغط على الخريطة لتحديد موقع العقار بدقة";
             switchPage('home');
+        }
+
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
         }
 
         function deleteAd(id, event) {
