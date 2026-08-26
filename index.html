@@ -317,25 +317,23 @@
 
         .news-item {
             background: #111;
-            padding: 12px;
-            margin-bottom: 12px;
-            border-radius: 5px;
-            border-right: 2px solid var(--gold);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border-right: 3px solid var(--gold);
         }
 
         .news-title {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: bold;
             color: var(--gold);
-            text-decoration: none;
-            display: block;
             margin-bottom: 8px;
         }
 
         .news-desc {
             color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 6px;
+            font-size: 14px;
+            margin-bottom: 8px;
         }
 
         .news-date {
@@ -612,7 +610,10 @@
 
         <!-- صفحة الأخبار -->
         <div id="news" class="page-view">
-            <div class="section-title">أخبار العقارات في قطر (آخر 14 يوماً)</div>
+            <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>أخبار العقارات</span>
+                <button class="btn-gold" onclick="openAddNewsModal()" style="font-size: 11px; padding: 4px 10px;">+ إضافة خبر جديد</button>
+            </div>
             <div id="news-grid">جاري تحميل الأخبار...</div>
         </div>
 
@@ -743,6 +744,9 @@
 
         let map, marker, fullMap, fullMarker;
         let allAds = [];
+        let newsList = JSON.parse(localStorage.getItem('almawathiq_news')) || [
+            { id: '1', title: 'افتتاح مشروع سكني جديد في لوسيل', description: 'أعلنت إحدى الشركات العقارية عن اطلاق مجمع سكني فاخر يضم فلل وشقق راقية.', date: '2026-08-25' }
+        ];
         let favorites = JSON.parse(localStorage.getItem('almawathiq_favs')) || [];
         let isLoggedIn = false;
         let currentUser = { name: '', phone: '' };
@@ -790,7 +794,7 @@
 
         window.onload = async function() {
             initMap();
-            fetchNews();
+            renderNews();
             await loadAdsFromFirebase();
             updateFavoritesView();
         };
@@ -906,7 +910,6 @@
                 const docRef = await addDoc(collection(db, "abdullah"), newAd);
                 newAd.id = docRef.id;
                 allAds.unshift(newAd);
-                saveToLocalStorage();
                 alert('تم نشر الإعلان بنجاح في قاعدة البيانات!');
                 event.target.reset();
                 if(marker) { map.removeLayer(marker); marker = null; }
@@ -1152,29 +1155,50 @@
             }
         }
 
-        async function fetchNews() {
-            const apiKey = 'pub_0d694ce2a4d14bbba74ebffebefe8e6';
-            const url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=عقارات قطر OR أسعار العقارات في قطر&language=ar`;
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                const newsGrid = document.getElementById('news-grid');
-                if (data.results && data.results.length > 0) {
-                    const fourteenDaysAgo = new Date();
-                    fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
-                    const filtered = data.results.filter(a => new Date(a.pubDate) >= fourteenDaysAgo);
-                    newsGrid.innerHTML = filtered.length > 0 ? filtered.map(article => `
-                        <div class="news-item">
-                            <a href="${article.link}" target="_blank" class="news-title">${article.title}</a>
-                            <div class="news-desc">${article.description || 'لا توجد تفاصيل.'}</div>
-                            <div class="news-date">تاريخ النشر: ${article.pubDate}</div>
-                        </div>
-                    `).join('') : 'لا توجد أخبار عقارية في قطر خلال الـ 14 يوماً الماضية.';
-                } else {
-                    newsGrid.innerHTML = 'لا توجد أخبار.';
-                }
-            } catch (error) {
-                document.getElementById('news-grid').innerHTML = 'حدث خطأ في تحميل الأخبار.';
+        // نظام إدارة ونشر الأخبار بنفسك
+        function renderNews() {
+            const newsGrid = document.getElementById('news-grid');
+            if (newsList.length === 0) {
+                newsGrid.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">لا توجد أخبار مضافة حالياً.</div>';
+                return;
+            }
+
+            newsGrid.innerHTML = newsList.map(item => `
+                <div class="news-item">
+                    <div class="news-title">${item.title}</div>
+                    <div class="news-desc">${item.description}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                        <span class="news-date">تاريخ النشر: ${item.date}</span>
+                        <button class="btn-delete-ad" onclick="deleteNews('${item.id}')">حذف الخبر</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.openAddNewsModal = function() {
+            const title = prompt("أدخل عنوان الخبر العقاري:");
+            if (!title) return;
+            const description = prompt("أدخل تفاصيل ومحتوى الخبر:");
+            if (!description) return;
+
+            const newNewsItem = {
+                id: Date.now().toString(),
+                title: title,
+                description: description,
+                date: new Date().toLocaleDateString('ar-QA')
+            };
+
+            newsList.unshift(newNewsItem);
+            localStorage.setItem('almawathiq_news', JSON.stringify(newsList));
+            renderNews();
+            alert('تم إضافة الخبر بنجاح!');
+        }
+
+        window.deleteNews = function(id) {
+            if (confirm('هل أنت متأكد من حذف هذا الخبر؟')) {
+                newsList = newsList.filter(n => n.id !== id);
+                localStorage.setItem('almawathiq_news', JSON.stringify(newsList));
+                renderNews();
             }
         }
     </script>
